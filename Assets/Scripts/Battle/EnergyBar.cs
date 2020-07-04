@@ -8,8 +8,8 @@ public class EnergyBar : MonoBehaviour
     private Slider progressionSlider;
     [SerializeField]
     private Slider actualSlider;
-
-    private float progressInterval = 1f;
+    [SerializeField]
+    private Text energyCountText;
 
     private float progressRate = 0f;
 
@@ -19,7 +19,6 @@ public class EnergyBar : MonoBehaviour
         progressionSlider.maxValue = max;
         actualSlider.maxValue = max;
 
-        progressInterval = interval;
         progressRate = 1f / interval;   // we always want to progress 1 unit
     }
 
@@ -28,6 +27,7 @@ public class EnergyBar : MonoBehaviour
         actualSlider.value = newValue;
         progressionSlider.value = newValue;
         progressRate = 1f / timeTillNextValue;
+        energyCountText.text = newValue.ToString();
     }
 
     private void Update()

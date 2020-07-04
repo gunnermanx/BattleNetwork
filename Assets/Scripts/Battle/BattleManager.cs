@@ -37,6 +37,7 @@ namespace BattleNetwork.Battle
         
         private void Start()
         {
+
             draggedUIEventListener = gameObject.GetComponent<DraggedUIEventListener>();
             draggedUIEventListener.draggedUIEventCallback += HandleDraggedUIEvent;
 

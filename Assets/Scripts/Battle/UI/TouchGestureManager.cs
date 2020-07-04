@@ -61,6 +61,7 @@ namespace BattleNetwork.Battle.UI
         {
             swipeGesture = new SwipeGestureRecognizer();
             swipeGesture.MinimumDistanceUnits = 0.5f;
+            swipeGesture.MinimumSpeedUnits = 2.0f;
             swipeGesture.Direction = SwipeGestureRecognizerDirection.Any;
             swipeGesture.StateUpdated += SwipeGestureCallback;
             FingersScript.Instance.AddGesture(swipeGesture);
