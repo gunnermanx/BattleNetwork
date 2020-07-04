@@ -10,7 +10,7 @@ namespace BattleNetwork.Battle
 {
 
     [RequireComponent(typeof(DraggedUIEventListener))]
-    public class BattleManager : MonoBehaviour
+    public class BattleManager : MonoBehaviour, IPunObservable
     {
         // temporary, we want to load it dynamically later
         [SerializeField] private GameObject arenaPrefab;
@@ -28,8 +28,11 @@ namespace BattleNetwork.Battle
         private SwipeGestureEventListener swipeGestureEventListener;
 
 
-        private int currentTick;
+        private int currentTick = -1;
+        private int sentTick = -1;
         private int energy = 0;
+
+        private readonly float tickTime = 0.5f;
 
         private Arena arena;
 
@@ -50,13 +53,17 @@ namespace BattleNetwork.Battle
             CreateUI();
             CreateArena();
             CreatePlayer();
-        
-            SetupRepeatingTick();  
+
+            // only the master client will update the tick
+            if (PhotonNetwork.IsMasterClient)
+            {
+                InvokeRepeating(nameof(MasterClientTick), 0f, tickTime);
+            }            
         }
 
         private void CreateUI()
         {
-
+            
         }
 
         private void CreateArena()
@@ -80,28 +87,27 @@ namespace BattleNetwork.Battle
             }
         }
 
-        private void SetupRepeatingTick()
-        {
-            currentTick = 0;
-            InvokeRepeating(nameof(Tick), 0f, 0.25f);
+
+        // Only the master client updates the tick
+        private void MasterClientTick()
+        {            
+            currentTick++;
+            HandleTickUpdated(currentTick);
         }
 
-        // TODO : lets have master client update this only
-        private void Tick()
+        private void HandleTickUpdated(int tick)
         {
             UpdateEnergy();
-
-            currentTick++;
             battleTickEvent.Raise(currentTick);
-
-            //Debug.LogFormat("Current Tick: {0}", tick);
         }
 
         private void UpdateEnergy()
         {
+            Debug.LogFormat("update energy: {0} at tick {1}", energy, currentTick);
+
             if (currentTick == 0)
             {
-                energyChangedEvent.Raise(energy, (float)battleConfig.ticksPerEnergy * 0.25f);
+                energyChangedEvent.Raise(energy, (float)battleConfig.ticksPerEnergy * tickTime);
             }
             else if (currentTick % battleConfig.ticksPerEnergy == 0)
             {
@@ -110,7 +116,7 @@ namespace BattleNetwork.Battle
                 if (newEnergy != energy)
                 {
                     energy = newEnergy;
-                    energyChangedEvent.Raise(energy, (float)battleConfig.ticksPerEnergy * 0.25f);
+                    energyChangedEvent.Raise(energy, (float)battleConfig.ticksPerEnergy * tickTime);
                 }
             }
         } 
@@ -144,6 +150,24 @@ namespace BattleNetwork.Battle
                 case SwipeGestureRecognizerDirection.Right:
                     arena.TryMoveRight(localPlayerUnit);
                     break;
+            }
+        }
+
+        public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+        {
+            if (PhotonNetwork.IsMasterClient)
+            {
+                if (currentTick != sentTick)
+                {
+                    Debug.LogFormat("sending tick: {0}", currentTick);
+                    stream.SendNext(currentTick);
+                    sentTick = currentTick;
+                }                
+            } else
+            {
+                currentTick = (int)stream.ReceiveNext();
+                Debug.LogFormat("receiving tick: {0}", currentTick);
+                HandleTickUpdated(currentTick);
             }
         }
     }

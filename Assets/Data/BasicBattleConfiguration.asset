@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 909c1ae1c03dfd147989053046571826, type: 3}
   m_Name: BasicBattleConfiguration
   m_EditorClassIdentifier: 
-  ticksPerEnergy: 8
+  ticksPerEnergy: 4
   maxEnergy: 10
