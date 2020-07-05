@@ -15,10 +15,15 @@ namespace BattleNetwork.Characters
         //test
         [SerializeField] private GameObject basicBulletPrefab;
 
+        private Damageable cachedDamageable;
 
         private void Start()
         {
             cachedPhotonView = gameObject.GetComponent<PhotonView>();
+            cachedDamageable = gameObject.GetComponent<Damageable>();
+
+            cachedDamageable.damageTaken += HandleDamageTaken;
+            cachedDamageable.owner = owner;
         }
 
         public void BasicAttack()
@@ -36,20 +41,29 @@ namespace BattleNetwork.Characters
                 direction = Vector3.left;
             }
            
-            cachedPhotonView.RPC("SendAttack", RpcTarget.All, startingPos, attackStartTime, direction);
+            cachedPhotonView.RPC("SendAttack", RpcTarget.All, startingPos, attackStartTime, direction, owner);
         }
 
         // prototype, later we should have attacks have own serialization function, and pass that over the wire instead.
         [PunRPC]
-        private void SendAttack(Vector3 startingPos, Double startTime, Vector3 direction)
+        private void SendAttack(Vector3 startingPos, Double startTime, Vector3 direction, Constants.Owner owner)
         {
-            Debug.LogFormat("Got SendAttack RPC {0}, {1}, {2}", startingPos, startTime, direction);
+            Debug.LogFormat("Got SendAttack RPC {0}, {1}, {2}, {3}", startingPos, startTime, direction, owner);
 
 
             GameObject bullet = GameObject.Instantiate(basicBulletPrefab);
-            bullet.transform.position = startingPos;
-            bullet.GetComponent<BasicProjectile>().Initialize(startTime, startingPos, direction);
+            bullet.transform.position = startingPos;            
+            bullet.GetComponent<BasicProjectile>().Initialize(startTime, startingPos, direction, owner);
 
+        }
+
+        private void HandleDamageTaken(int amount, int remaining)
+        {
+            if (remaining <= 0)
+            {
+                
+                Debug.Log("omg died");
+            }
         }
     }
 }

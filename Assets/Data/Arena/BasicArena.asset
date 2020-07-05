@@ -62,46 +62,46 @@ MonoBehaviour:
     owner: 1
   - name: 3_0
     position: {x: 6, y: 0, z: 0}
-    tilePrefab: {fileID: 450864977008238713, guid: 6bd22057a96238b4bad6acfabc555d32,
+    tilePrefab: {fileID: 450864977008238713, guid: 54ad1beaddd44dc4faf80a378b2a372b,
       type: 3}
     owner: 2
   - name: 3_1
     position: {x: 6, y: 0, z: 2}
-    tilePrefab: {fileID: 450864977008238713, guid: 6bd22057a96238b4bad6acfabc555d32,
+    tilePrefab: {fileID: 450864977008238713, guid: 54ad1beaddd44dc4faf80a378b2a372b,
       type: 3}
     owner: 2
   - name: 3_2
     position: {x: 6, y: 0, z: 4}
-    tilePrefab: {fileID: 450864977008238713, guid: 6bd22057a96238b4bad6acfabc555d32,
+    tilePrefab: {fileID: 450864977008238713, guid: 54ad1beaddd44dc4faf80a378b2a372b,
       type: 3}
     owner: 2
   - name: 4_0
     position: {x: 8, y: 0, z: 0}
-    tilePrefab: {fileID: 450864977008238713, guid: 6bd22057a96238b4bad6acfabc555d32,
+    tilePrefab: {fileID: 450864977008238713, guid: 54ad1beaddd44dc4faf80a378b2a372b,
       type: 3}
     owner: 2
   - name: 4_1
     position: {x: 8, y: 0, z: 2}
-    tilePrefab: {fileID: 450864977008238713, guid: 6bd22057a96238b4bad6acfabc555d32,
+    tilePrefab: {fileID: 450864977008238713, guid: 54ad1beaddd44dc4faf80a378b2a372b,
       type: 3}
     owner: 2
   - name: 4_2
     position: {x: 8, y: 0, z: 4}
-    tilePrefab: {fileID: 450864977008238713, guid: 6bd22057a96238b4bad6acfabc555d32,
+    tilePrefab: {fileID: 450864977008238713, guid: 54ad1beaddd44dc4faf80a378b2a372b,
       type: 3}
     owner: 2
   - name: 5_0
     position: {x: 10, y: 0, z: 0}
-    tilePrefab: {fileID: 450864977008238713, guid: 6bd22057a96238b4bad6acfabc555d32,
+    tilePrefab: {fileID: 450864977008238713, guid: 54ad1beaddd44dc4faf80a378b2a372b,
       type: 3}
     owner: 2
   - name: 5_1
     position: {x: 10, y: 0, z: 2}
-    tilePrefab: {fileID: 450864977008238713, guid: 6bd22057a96238b4bad6acfabc555d32,
+    tilePrefab: {fileID: 450864977008238713, guid: 54ad1beaddd44dc4faf80a378b2a372b,
       type: 3}
     owner: 2
   - name: 5_2
     position: {x: 10, y: 0, z: 4}
-    tilePrefab: {fileID: 450864977008238713, guid: 6bd22057a96238b4bad6acfabc555d32,
+    tilePrefab: {fileID: 450864977008238713, guid: 54ad1beaddd44dc4faf80a378b2a372b,
       type: 3}
     owner: 2

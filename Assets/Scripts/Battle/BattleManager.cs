@@ -84,7 +84,7 @@ namespace BattleNetwork.Battle
                 GameObject localPlayerUnitGO = PhotonNetwork.Instantiate(playerPrefab.name, Vector3.zero, Quaternion.identity, 0);
 
                 // "Place" the Player in the arena
-                Constants.Owner owner = PhotonNetwork.IsMasterClient ? Constants.Owner.Player1 : Constants.Owner.Player2;
+                Constants.Owner owner = PhotonNetwork.IsMasterClient ? Constants.Owner.Player1 : Constants.Owner.Player2;                
                 localPlayerUnit = localPlayerUnitGO.GetComponent<PlayerUnit>();
                 arena.PlacePlayerUnit(localPlayerUnit, owner);
             }
