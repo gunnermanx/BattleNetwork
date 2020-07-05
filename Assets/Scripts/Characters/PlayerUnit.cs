@@ -32,6 +32,7 @@ namespace BattleNetwork.Characters
 
             cachedDamageable.damageTaken += HandleDamageTaken;
             cachedDamageable.owner = owner;
+            cachedDamageable.SetCurrent(100);  // TODO read from config 
 
             playerCreatedEvent.Raise(this);
         }
@@ -73,6 +74,12 @@ namespace BattleNetwork.Characters
             {
                 
                 Debug.Log("omg died");
+                // TODO
+                PhotonView pv = gameObject.GetComponent<PhotonView>();
+                if (pv.IsMine)
+                {
+                    PhotonNetwork.Destroy(gameObject);
+                }
             }
         }
 
