@@ -56,8 +56,10 @@ namespace BattleNetwork.Battle
         {            
             CreateArena();
             CreatePlayer();
-            CreateUI();
+            CreateDeck();
 
+            CreateUI();
+            
             // only the master client will update the tick
             if (PhotonNetwork.IsMasterClient)
             {
@@ -65,11 +67,7 @@ namespace BattleNetwork.Battle
             }            
         }
 
-        private void CreateUI()
-        {
-            // tODO later create the battle ui dynamically maybe
-            
-        }
+
 
         private void CreateArena()
         {
@@ -90,6 +88,19 @@ namespace BattleNetwork.Battle
                 localPlayerUnit = localPlayerUnitGO.GetComponent<PlayerUnit>();
                 arena.PlacePlayerUnit(localPlayerUnit, owner);
             }
+        }
+
+
+        private void CreateDeck()
+        {
+
+        }
+
+
+        private void CreateUI()
+        {
+            // tODO later create the battle ui dynamically maybe
+
         }
 
 
@@ -167,14 +178,12 @@ namespace BattleNetwork.Battle
             {
                 if (currentTick != sentTick)
                 {
-                    //Debug.LogFormat("sending tick: {0}", currentTick);
                     stream.SendNext(currentTick);
                     sentTick = currentTick;
                 }                
             } else
             {
                 currentTick = (int)stream.ReceiveNext();
-                //Debug.LogFormat("receiving tick: {0}", currentTick);
                 HandleTickUpdated(currentTick);
             }
         }

@@ -71,9 +71,7 @@ namespace BattleNetwork.Characters
         private void HandleDamageTaken(int amount, int remaining)
         {
             if (remaining <= 0)
-            {
-                
-                Debug.Log("omg died");
+            {                
                 // TODO
                 PhotonView pv = gameObject.GetComponent<PhotonView>();
                 if (pv.IsMine)
