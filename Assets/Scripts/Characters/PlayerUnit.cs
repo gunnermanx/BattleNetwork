@@ -5,8 +5,13 @@ using UnityEngine;
 
 namespace BattleNetwork.Characters
 {
-    public class PlayerUnit: MonoBehaviour
+    public class PlayerUnit: MonoBehaviour, IPunObservable
     {
+        public class InstantiationData {
+            public Constants.Owner owner;
+            public string currentTile;
+        }
+
         public string currentTile;
         public Constants.Owner owner;
 
@@ -63,6 +68,20 @@ namespace BattleNetwork.Characters
             {
                 
                 Debug.Log("omg died");
+            }
+        }
+
+        public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+        {
+            if (stream.IsWriting)
+            {
+                stream.SendNext(owner);
+                stream.SendNext(currentTile);
+            }
+            else
+            {
+                owner = (Constants.Owner)stream.ReceiveNext();
+                currentTile = (string)stream.ReceiveNext();
             }
         }
     }

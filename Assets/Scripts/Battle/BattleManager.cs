@@ -5,8 +5,6 @@ using BattleNetwork.Events;
 using System;
 using DigitalRubyShared;
 using BattleNetwork.Battle.UI;
-using UnityEngine.AI;
-
 namespace BattleNetwork.Battle
 {
 
@@ -80,7 +78,7 @@ namespace BattleNetwork.Battle
         {
             if (localPlayerUnit == null)
             {              
-                // we're in a room. spawn a character for the local player. it gets synced by using PhotonNetwork.Instantiate
+                // we're in a room. spawn a character for the local player. it gets synced by using PhotonNetwork.Instantiate                
                 GameObject localPlayerUnitGO = PhotonNetwork.Instantiate(playerPrefab.name, Vector3.zero, Quaternion.identity, 0);
 
                 // "Place" the Player in the arena
