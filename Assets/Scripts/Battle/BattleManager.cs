@@ -5,6 +5,7 @@ using BattleNetwork.Events;
 using System;
 using DigitalRubyShared;
 using BattleNetwork.Battle.UI;
+using UnityEngine.AI;
 
 namespace BattleNetwork.Battle
 {
@@ -26,7 +27,7 @@ namespace BattleNetwork.Battle
 
         private DraggedUIEventListener draggedUIEventListener;
         private SwipeGestureEventListener swipeGestureEventListener;
-
+        private TapGestureEventListener tapGestureEventListener;        
 
         private int currentTick = -1;
         private int sentTick = -1;
@@ -40,12 +41,14 @@ namespace BattleNetwork.Battle
         
         private void Start()
         {
-
             draggedUIEventListener = gameObject.GetComponent<DraggedUIEventListener>();
             draggedUIEventListener.draggedUIEventCallback += HandleDraggedUIEvent;
 
             swipeGestureEventListener = gameObject.GetComponent<SwipeGestureEventListener>();
             swipeGestureEventListener.swipeGestureEventCallback += HandleSwipeGestureEvent;
+
+            tapGestureEventListener = gameObject.GetComponent<TapGestureEventListener>();
+            tapGestureEventListener.tapGestureEventCallback += HandleTapGestureEvent;
         }
 
         public void StartBattle()
@@ -90,7 +93,7 @@ namespace BattleNetwork.Battle
 
         // Only the master client updates the tick
         private void MasterClientTick()
-        {            
+        {
             currentTick++;
             HandleTickUpdated(currentTick);
         }
@@ -103,8 +106,6 @@ namespace BattleNetwork.Battle
 
         private void UpdateEnergy()
         {
-            Debug.LogFormat("update energy: {0} at tick {1}", energy, currentTick);
-
             if (currentTick == 0)
             {
                 energyChangedEvent.Raise(energy, (float)battleConfig.ticksPerEnergy * tickTime);
@@ -153,22 +154,28 @@ namespace BattleNetwork.Battle
             }
         }
 
+        private void HandleTapGestureEvent(Vector2 screenPos)
+        {
+            localPlayerUnit.BasicAttack();
+        }
+
         public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
         {
             if (PhotonNetwork.IsMasterClient)
             {
                 if (currentTick != sentTick)
                 {
-                    Debug.LogFormat("sending tick: {0}", currentTick);
+                    //Debug.LogFormat("sending tick: {0}", currentTick);
                     stream.SendNext(currentTick);
                     sentTick = currentTick;
                 }                
             } else
             {
                 currentTick = (int)stream.ReceiveNext();
-                Debug.LogFormat("receiving tick: {0}", currentTick);
+                //Debug.LogFormat("receiving tick: {0}", currentTick);
                 HandleTickUpdated(currentTick);
             }
         }
+
     }
 }

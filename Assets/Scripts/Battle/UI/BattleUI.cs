@@ -22,8 +22,7 @@ namespace BattleNetwork.Battle.UI
         }
 
         private void HandleEnergyChangedEvent(int currentEnergy, float timeTillNextEnergySecs)
-        {
-            Debug.LogFormat("handleEnergyChangedEvent {0}", currentEnergy);
+        {            
             energyBar.SetToValue(currentEnergy, timeTillNextEnergySecs);                                   
         }
         

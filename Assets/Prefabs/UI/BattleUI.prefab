@@ -1085,6 +1085,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   draggedUIEvent: {fileID: 11400000, guid: e2575ac1b38978f4f9a9e00d4c568655, type: 2}
   swipeGestureEvent: {fileID: 11400000, guid: 28cea7148ba79f34ba8eeed6c2c00cb6, type: 2}
+  tapGestureEvent: {fileID: 11400000, guid: 7cc4292a2b8a35b4288d9ae98e0a887e, type: 2}
   swipeArea: {fileID: 496436274}
 --- !u!114 &6858872927247450937
 MonoBehaviour:

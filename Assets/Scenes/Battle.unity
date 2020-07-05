@@ -204,47 +204,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 26.155, y: 0, z: 0}
---- !u!1 &126510577 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6443372916835605073, guid: 19a1c5f237030d248b19eafd9aa9235b,
-    type: 3}
-  m_PrefabInstance: {fileID: 6443372917188002173}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &126510578
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 126510577}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bcc3b73695a9f674f9c81ff176ced33f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Event: {fileID: 11400000, guid: 28cea7148ba79f34ba8eeed6c2c00cb6, type: 2}
---- !u!114 &126510579
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 126510577}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 1
-  OwnershipTransfer: 0
-  ObservedComponents:
-  - {fileID: 453434158}
-  viewIdField: 1
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
 --- !u!1 &440064240
 GameObject:
   m_ObjectHideFlags: 0
@@ -343,7 +302,7 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 6443372917188002173}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 126510577}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 61e8965c5cfdf7b4baa6d78890826fde, type: 3}
@@ -633,6 +592,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 126510579, guid: 19a1c5f237030d248b19eafd9aa9235b, type: 3}
+      propertyPath: viewIdField
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6443372916835605072, guid: 19a1c5f237030d248b19eafd9aa9235b,
         type: 3}
       propertyPath: m_LocalPosition.x

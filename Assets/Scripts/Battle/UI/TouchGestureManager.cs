@@ -16,6 +16,9 @@ namespace BattleNetwork.Battle.UI
         [SerializeField]
         private SwipeGestureEvent swipeGestureEvent;
         [SerializeField]
+        private TapGestureEvent tapGestureEvent;
+
+        [SerializeField]
         private RectTransform swipeArea;
 
 
@@ -71,8 +74,8 @@ namespace BattleNetwork.Battle.UI
         {
             if (gesture.State == GestureRecognizerState.Ended)
             {
-                Debug.LogFormat("Tapped at {0}, {1}", gesture.FocusX, gesture.FocusY);
-                // TODO add TappedUIEvent or something similar
+                //Debug.LogFormat("Tapped at {0}, {1}", gesture.FocusX, gesture.FocusY);
+                tapGestureEvent.Raise(new Vector2(gesture.FocusX, gesture.FocusY));
             }
         }
 

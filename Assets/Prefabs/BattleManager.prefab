@@ -11,6 +11,9 @@ GameObject:
   - component: {fileID: 6443372916835605072}
   - component: {fileID: 6443372916835605075}
   - component: {fileID: 126510578}
+  - component: {fileID: 8831637807920765437}
+  - component: {fileID: 126510580}
+  - component: {fileID: 126510579}
   m_Layer: 0
   m_Name: BattleManager
   m_TagString: Untagged
@@ -64,3 +67,51 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Event: {fileID: 11400000, guid: e2575ac1b38978f4f9a9e00d4c568655, type: 2}
+--- !u!114 &8831637807920765437
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6443372916835605073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcc3b73695a9f674f9c81ff176ced33f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Event: {fileID: 11400000, guid: 28cea7148ba79f34ba8eeed6c2c00cb6, type: 2}
+--- !u!114 &126510580
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6443372916835605073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10c058b79a2ac32418850fdebbf7c054, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Event: {fileID: 11400000, guid: 7cc4292a2b8a35b4288d9ae98e0a887e, type: 2}
+--- !u!114 &126510579
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6443372916835605073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 1
+  OwnershipTransfer: 0
+  ObservedComponents:
+  - {fileID: 6443372916835605075}
+  viewIdField: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
