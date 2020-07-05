@@ -415,8 +415,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 18
+    m_Font: {fileID: 12800000, guid: 90d4c2c2be504d7489f023879f54fb9d, type: 3}
+    m_FontSize: 20
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 1
@@ -934,6 +934,7 @@ GameObject:
   - component: {fileID: 4288917342872978184}
   - component: {fileID: 719919586}
   - component: {fileID: 8846894409055335634}
+  - component: {fileID: 6938727998959499561}
   - component: {fileID: 8635638974259153508}
   - component: {fileID: 8635638974259153509}
   - component: {fileID: 8635638974259153510}
@@ -980,9 +981,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 646c52a6b7860014fab636f39638f0e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hpDisplayPrefab: {fileID: 6858441329027455901, guid: b08c47ce7da25bf488f562bf5bb45a99,
+    type: 3}
   chipDockUI: {fileID: 1370284088}
   energyBar: {fileID: 3460476308470491390}
   battleConfig: {fileID: 11400000, guid: 8b9c1230bc3e8c542937bb03b6a5110d, type: 2}
+  playerUnitCreatedEventListener: {fileID: 6938727998959499561}
   energyChangedEventListener: {fileID: 719919586}
   draggedUIEventListener: {fileID: 8846894409055335634}
 --- !u!114 &719919586
@@ -1011,6 +1015,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Event: {fileID: 11400000, guid: e2575ac1b38978f4f9a9e00d4c568655, type: 2}
+--- !u!114 &6938727998959499561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8635638974259153511}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6effe8a0fc03214697cbf3fd60cfaf2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Event: {fileID: 11400000, guid: e43e81df2eb2666488aaa3b67be4ee89, type: 2}
 --- !u!223 &8635638974259153508
 Canvas:
   m_ObjectHideFlags: 0

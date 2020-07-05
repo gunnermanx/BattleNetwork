@@ -17,6 +17,11 @@ namespace BattleNetwork.Characters
         {
             hitpoints = 100;
         }
+
+        public int Current()
+        {
+            return hitpoints;
+        }
         
         public void Damage(int amount)
         {

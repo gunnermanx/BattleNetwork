@@ -1,5 +1,6 @@
 ﻿using System;
 using BattleNetwork.Battle;
+using BattleNetwork.Events;
 using Photon.Pun;
 using UnityEngine;
 
@@ -17,6 +18,8 @@ namespace BattleNetwork.Characters
 
         private PhotonView cachedPhotonView;
 
+        [SerializeField] private PlayerUnitCreatedEvent playerCreatedEvent;
+
         //test
         [SerializeField] private GameObject basicBulletPrefab;
 
@@ -29,6 +32,8 @@ namespace BattleNetwork.Characters
 
             cachedDamageable.damageTaken += HandleDamageTaken;
             cachedDamageable.owner = owner;
+
+            playerCreatedEvent.Raise(this);
         }
 
         public void BasicAttack()

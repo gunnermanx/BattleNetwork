@@ -150,6 +150,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentTile: 
   owner: 0
+  playerCreatedEvent: {fileID: 11400000, guid: e43e81df2eb2666488aaa3b67be4ee89, type: 2}
   basicBulletPrefab: {fileID: 8343962295932349276, guid: 8c1edbef2e4394342b4b2fd426199b2c,
     type: 3}
 --- !u!54 &7317332120657980309

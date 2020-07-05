@@ -51,6 +51,7 @@ MonoBehaviour:
     type: 3}
   playerPrefab: {fileID: 4611779920883957467, guid: 88c9c70d7e186c742a3caf46cc01c24b,
     type: 3}
+  battleUI: {fileID: 0}
   battleConfig: {fileID: 11400000, guid: 8b9c1230bc3e8c542937bb03b6a5110d, type: 2}
   battleTickEvent: {fileID: 11400000, guid: 3da05f6cdd1cc3b44a6ef4ae9517b9cf, type: 2}
   energyChangedEvent: {fileID: 11400000, guid: a33716ac48b691e46b1c37b060d64683, type: 2}

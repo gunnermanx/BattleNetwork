@@ -1,15 +1,19 @@
-﻿using BattleNetwork.Events;
+﻿using BattleNetwork.Characters;
+using BattleNetwork.Events;
 using UnityEngine;
 
 namespace BattleNetwork.Battle.UI
 {
     public class BattleUI : MonoBehaviour
     {
+        [SerializeField] private GameObject hpDisplayPrefab;
+
         [SerializeField] private ChipDockUI chipDockUI;
         [SerializeField] private EnergyBar energyBar;
 
         [SerializeField] private BattleConfigurationData battleConfig;
 
+        [SerializeField] private PlayerUnitCreatedEventListener playerUnitCreatedEventListener;
         [SerializeField] private EnergyChangedEventListener energyChangedEventListener;
         [SerializeField] private DraggedUIEventListener draggedUIEventListener;
        
@@ -17,6 +21,7 @@ namespace BattleNetwork.Battle.UI
         {
             energyChangedEventListener.energyChangedCallback += HandleEnergyChangedEvent;
             draggedUIEventListener.draggedUIEventCallback += HandleDraggedUIEvent;
+            playerUnitCreatedEventListener.playerCreatedCallback += HandlePlayerUnitCreatedEvent;
 
             energyBar.InitializeWithMaxAndInterval(battleConfig.maxEnergy, battleConfig.ticksPerEnergy);                       
         }
@@ -39,6 +44,14 @@ namespace BattleNetwork.Battle.UI
                     chipDockUI.Maximize();
                 }
             }            
+        }
+
+        private void HandlePlayerUnitCreatedEvent(PlayerUnit player)
+        {
+            Damageable damageable = player.gameObject.GetComponent<Damageable>();
+            GameObject hpDisplay = GameObject.Instantiate(hpDisplayPrefab, transform);
+            hpDisplay.GetComponent<UnitHPDisplay>()
+                .AttachToIDamageable(damageable, new Vector2(0f, -20f));
         }
     }
 }

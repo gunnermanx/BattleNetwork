@@ -5,6 +5,7 @@ using BattleNetwork.Events;
 using System;
 using DigitalRubyShared;
 using BattleNetwork.Battle.UI;
+
 namespace BattleNetwork.Battle
 {
 
@@ -16,6 +17,8 @@ namespace BattleNetwork.Battle
         // temporary, we want to load it dynamically later
         [SerializeField] private GameObject playerPrefab;
 
+
+        [SerializeField] private BattleUI battleUI;       
 
         [SerializeField] private BattleConfigurationData battleConfig;
 
@@ -50,10 +53,10 @@ namespace BattleNetwork.Battle
         }
 
         public void StartBattle()
-        {
-            CreateUI();
+        {            
             CreateArena();
             CreatePlayer();
+            CreateUI();
 
             // only the master client will update the tick
             if (PhotonNetwork.IsMasterClient)
@@ -64,6 +67,7 @@ namespace BattleNetwork.Battle
 
         private void CreateUI()
         {
+            // tODO later create the battle ui dynamically maybe
             
         }
 
