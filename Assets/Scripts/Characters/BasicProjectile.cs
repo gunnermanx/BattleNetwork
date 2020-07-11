@@ -44,7 +44,7 @@ namespace BattleNetwork.Characters
             if (owner == Constants.Owner.Player1)
             {
                 currentTransform.position = new Vector3(
-                    currentTransform.position.x + 0.2f,
+                    currentTransform.position.x + 0.4f,
                     currentTransform.position.y,
                     currentTransform.position.z
                 );
@@ -52,7 +52,7 @@ namespace BattleNetwork.Characters
             {
                 currentTransform.position = new Vector3(
                     // within 10 ticks, arrives at the next grid spot
-                    currentTransform.position.x - 0.2f,
+                    currentTransform.position.x - 0.4f,
                     currentTransform.position.y,
                     currentTransform.position.z
                 );

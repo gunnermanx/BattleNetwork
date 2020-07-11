@@ -41,7 +41,7 @@ namespace BattleNetwork.Battle
 
         private int energy = 0;
 
-        private readonly float tickTime = 0.1f;
+        private readonly float tickTime = 0.05f;
 
         private Arena arena;
 
@@ -142,7 +142,8 @@ namespace BattleNetwork.Battle
 
                 // TODO check and possibly play chips
 
-                int cid = 10;
+                // test cid
+                int cid = 0;
 
                 SFSObject obj = new SFSObject();
                 obj.PutInt("cid", cid);
@@ -220,7 +221,7 @@ namespace BattleNetwork.Battle
                 byte cmdId = cmd.GetByte(0);
                 // create a function to multiplex to different parsers
 
-                Debug.LogFormat("    processing cmd with id == {0}", cmdId);
+                //Debug.LogFormat("    processing cmd with id == {0}", cmdId);
 
                 // move cmd
                 if (cmdId == (byte) 0)
