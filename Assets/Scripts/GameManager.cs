@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour
 
         if (sfs == null)
         {
-            SceneManager.LoadScene("Login");
+            SceneManager.LoadScene("Connector");
             return;
         }
 
@@ -63,7 +63,7 @@ public class GameManager : MonoBehaviour
 
         if (!shuttingDown)
         {
-            SceneManager.LoadScene("Login");
+            SceneManager.LoadScene("Connector");
         }
     }
 }

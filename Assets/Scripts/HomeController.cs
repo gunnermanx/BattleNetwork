@@ -26,7 +26,7 @@ public class HomeController : MonoBehaviour
 
         if (sfs == null)
         {
-            SceneManager.LoadScene("Login");
+            SceneManager.LoadScene("Connector");
             return;
         }
 
@@ -103,7 +103,7 @@ public class HomeController : MonoBehaviour
 
         if (!shuttingDown)
         {
-            SceneManager.LoadScene("Login");
+            SceneManager.LoadScene("Connector");
         }
     }
 

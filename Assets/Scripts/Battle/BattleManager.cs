@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using Photon.Pun;
 using BattleNetwork.Characters;
 using BattleNetwork.Events;
 using System;
