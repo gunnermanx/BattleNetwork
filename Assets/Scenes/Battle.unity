@@ -315,14 +315,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 496436274, guid: 6f18bf6adc99ebc4193a73bb309ef10c, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 25
-      objectReference: {fileID: 0}
-    - target: {fileID: 496436274, guid: 6f18bf6adc99ebc4193a73bb309ef10c, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: -250
-      objectReference: {fileID: 0}
     - target: {fileID: 2077554243, guid: 6f18bf6adc99ebc4193a73bb309ef10c, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -446,26 +438,6 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8635638974259153508, guid: 6f18bf6adc99ebc4193a73bb309ef10c,
-        type: 3}
-      propertyPath: m_PixelPerfect
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8635638974259153509, guid: 6f18bf6adc99ebc4193a73bb309ef10c,
-        type: 3}
-      propertyPath: m_UiScaleMode
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8635638974259153509, guid: 6f18bf6adc99ebc4193a73bb309ef10c,
-        type: 3}
-      propertyPath: m_ReferenceResolution.x
-      value: 1334
-      objectReference: {fileID: 0}
-    - target: {fileID: 8635638974259153509, guid: 6f18bf6adc99ebc4193a73bb309ef10c,
-        type: 3}
-      propertyPath: m_ReferenceResolution.y
-      value: 750
-      objectReference: {fileID: 0}
     - target: {fileID: 8635638974259153511, guid: 6f18bf6adc99ebc4193a73bb309ef10c,
         type: 3}
       propertyPath: m_Name
@@ -485,6 +457,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 646c52a6b7860014fab636f39638f0e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1435907799 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1435907799, guid: 6f18bf6adc99ebc4193a73bb309ef10c,
+    type: 3}
+  m_PrefabInstance: {fileID: 862076822}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1956368667
 GameObject:
   m_ObjectHideFlags: 0
@@ -632,10 +610,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 126510579, guid: 19a1c5f237030d248b19eafd9aa9235b, type: 3}
-      propertyPath: viewIdField
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 6443372916835605072, guid: 19a1c5f237030d248b19eafd9aa9235b,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -696,6 +670,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: BattleManager
       objectReference: {fileID: 0}
+    - target: {fileID: 6443372916835605075, guid: 19a1c5f237030d248b19eafd9aa9235b,
+        type: 3}
+      propertyPath: loadingScreen
+      value: 
+      objectReference: {fileID: 1435907799}
     - target: {fileID: 6443372916835605075, guid: 19a1c5f237030d248b19eafd9aa9235b,
         type: 3}
       propertyPath: battleUI

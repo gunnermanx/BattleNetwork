@@ -23,7 +23,10 @@ namespace BattleNetwork.Battle.UI
             draggedUIEventListener.draggedUIEventCallback += HandleDraggedUIEvent;
             playerUnitCreatedEventListener.playerCreatedCallback += HandlePlayerUnitCreatedEvent;
 
-            energyBar.InitializeWithMaxAndInterval(battleConfig.maxEnergy, battleConfig.ticksPerEnergy);                       
+            energyBar.InitializeWithMaxAndInterval(0, battleConfig.maxEnergy);
+
+            // TODO
+            chipDockUI.TestInitializeDock();
         }
 
         private void HandleEnergyChangedEvent(int currentEnergy, float timeTillNextEnergySecs)

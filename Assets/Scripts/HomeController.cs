@@ -10,6 +10,8 @@ using UnityEngine.SceneManagement;
 
 public class HomeController : MonoBehaviour
 {
+    private const string EXTENSION_ID = "BattleNetwork";
+    private const string EXTENSION_CLASS = "battleNetwork.BattleNetworkExtension";
 
     private SmartFox sfs;
     private bool shuttingDown;
@@ -88,7 +90,7 @@ public class HomeController : MonoBehaviour
             settings.IsGame = true;
             settings.MaxUsers = 2;
             settings.MaxSpectators = 0;
-            //settings.Extension = new RoomExtension(EXTENSION_ID, EXTENSION_CLASS);
+            settings.Extension = new RoomExtension(EXTENSION_ID, EXTENSION_CLASS);
 
             // creatiing room doesnt make you join a room
             sfs.Send(new CreateRoomRequest(settings));

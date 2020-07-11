@@ -19,6 +19,7 @@ public class LoginController : MonoBehaviour
     [SerializeField] private ScrollRect debugScrollRect;
     [SerializeField] private Text debugText;
 
+    //private string defaultHost = "3.12.181.63";
     private string defaultHost = "127.0.0.1";
     private string defaultPort = "9933";
 

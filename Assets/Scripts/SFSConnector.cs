@@ -6,7 +6,7 @@ public class SFSConnector : MonoBehaviour
 {
     // TODO: Read from config file? 
     // Need to be flexible so we dont need a code change if server dies
-    private string defaultHost = "127.0.0.1";
+    private string defaultHost = "3.12.181.63";
     private string defaultPort = "9933";
 
     private SmartFox sfs;

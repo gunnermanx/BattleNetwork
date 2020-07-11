@@ -14,27 +14,48 @@ namespace BattleNetwork.Battle
 
         [SerializeField]
         private Transform arenaAnchorsParent;
-      
+
         private Dictionary<string, GameObject> anchors;
         private Dictionary<string, Tile> tiles;
 
+        private Dictionary<int, BaseUnit> units;
+
+        private PlayerUnit p1PlayerUnit;
+        private PlayerUnit p2PlayerUnit;
 
         public void Initialize()
         {
+            // will need to be changed, load data based on name, and what server told us
             LoadArenaData();
+
+            units = new Dictionary<int, BaseUnit>();
         }
 
 
         public void PlacePlayerUnit(PlayerUnit unit, Constants.Owner owner)
         {
+            Debug.LogFormat("placing a player unit for player {0}", owner);
+
+
             string startingTileName = (owner == Constants.Owner.Player1) ? arenaData.player1StartingTileName : arenaData.player2StartingTileName;
             unit.currentTile = startingTileName;
             GameObject anchor = GetAnchorForTileName(startingTileName);
             if (anchor != null)
             {
-                unit.transform.position = anchor.transform.position + new Vector3(0f, 0.5f, 0f);                
+                unit.transform.position = anchor.transform.position + new Vector3(0f, 0.5f, 0f);
             }
             unit.owner = owner;
+
+            units.Add(unit.id, unit);
+
+            if (owner == Constants.Owner.Player1)
+            {
+                p1PlayerUnit = unit;
+            }
+            else if (owner == Constants.Owner.Player2)
+            {
+                p2PlayerUnit = unit;            }
+
         }
 
         private GameObject GetAnchorForTileName(string tileName)
@@ -48,96 +69,57 @@ namespace BattleNetwork.Battle
         }
 
 
-
         // statically determine which path to go instead of recalculating
 
-        public bool TryMoveUp(PlayerUnit unit)
+        public void ServerMoveUnit(int unitId, int x, int y)
         {
-            string currentTileName = unit.currentTile;
-            string[] currentTileNameArr = currentTileName.Split('_');
-            int z = Int32.Parse(currentTileNameArr[1]);
-            string newTileName = currentTileNameArr[0] + "_" + (z + 1);
+            BaseUnit unit;
+            bool found = units.TryGetValue(unitId, out unit);
+
+            string newTileName = x + "_" + y;
 
             Tile newTile;
             if (tiles.TryGetValue(newTileName, out newTile))
             {
-                if (unit.owner != newTile.owner)
-                {
-                    return false;
-                }
                 unit.currentTile = newTileName;
-                unit.transform.position = newTile.transform.position + new Vector3(0f, 0.5f, 0f);
-                return true;
+                unit.transform.position = newTile.transform.position + new Vector3(0f, 0.5f, 0f);                
             }
-
-            return false;
         }
 
-        public bool TryMoveDown(PlayerUnit unit)
+        public void ServerDamageUnit(int unitId, int damage)
         {
-            string currentTileName = unit.currentTile;
-            string[] currentTileNameArr = currentTileName.Split('_');
-            int z = Int32.Parse(currentTileNameArr[1]);
-            string newTileName = currentTileNameArr[0] + "_" + (z - 1);
+            BaseUnit unit;
+            bool found = units.TryGetValue(unitId, out unit);
 
-            Tile newTile;
-            if (tiles.TryGetValue(newTileName, out newTile))
-            {
-                if (unit.owner != newTile.owner)
-                {
-                    return false;
-                }
-                unit.currentTile = newTileName;
-                unit.transform.position = newTile.transform.position + new Vector3(0f, 0.5f, 0f);
-                return true;
-            }
+            Damageable d = unit.GetComponent<Damageable>();
 
-            return false;
+            d.Damage(damage);
         }
 
-        public bool TryMoveLeft(PlayerUnit unit)
+        public void PlayChip(int playerId, int chipId)
         {
-            string currentTileName = unit.currentTile;
-            string[] currentTileNameArr = currentTileName.Split('_');
-            int x = Int32.Parse(currentTileNameArr[0]);
-            string newTileName = (x - 1) + "_" + currentTileNameArr[1];
+            // TEMP just create a straight projectile
 
-            Tile newTile;
-            if (tiles.TryGetValue(newTileName, out newTile))
+            GameObject projectile = Instantiate(
+                Resources.Load("TestStraightProjectile", typeof(GameObject))
+            ) as GameObject;
+            BasicProjectile p = projectile.GetComponent<BasicProjectile>();
+
+            Vector3 position = Vector3.zero;
+            Constants.Owner owner = Constants.Owner.None;
+            if (playerId == 1)
             {
-                if (unit.owner != newTile.owner)
-                {
-                    return false;
-                }
-                unit.currentTile = newTileName;
-                unit.transform.position = newTile.transform.position + new Vector3(0f, 0.5f, 0f);
-                return true;
+                position = p1PlayerUnit.transform.position;
+                owner = Constants.Owner.Player1;
             }
-
-            return false;
+            else if (playerId == 2)
+            {
+                position = p2PlayerUnit.transform.position;
+                owner = Constants.Owner.Player2;
+            }
+            p.Initialize(position, owner);
         }
 
-        public bool TryMoveRight(PlayerUnit unit)
-        {
-            string currentTileName = unit.currentTile;
-            string[] currentTileNameArr = currentTileName.Split('_');
-            int x = Int32.Parse(currentTileNameArr[0]);
-            string newTileName = (x + 1) + "_" + currentTileNameArr[1];
-
-            Tile newTile;
-            if (tiles.TryGetValue(newTileName, out newTile))
-            {
-                if (unit.owner != newTile.owner)
-                {
-                    return false;
-                }
-                unit.currentTile = newTileName;
-                unit.transform.position = newTile.transform.position + new Vector3(0f, 0.5f, 0f);
-                return true;
-            }
-
-            return false;
-        }
 
         private void LoadArenaData()
         {

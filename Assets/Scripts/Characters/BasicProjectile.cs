@@ -2,6 +2,7 @@
 using Photon.Pun;
 using System;
 using BattleNetwork.Battle;
+using BattleNetwork.Events;
 
 namespace BattleNetwork.Characters
 {
@@ -20,47 +21,56 @@ namespace BattleNetwork.Characters
         private int damage = 10;
         private Double lifetime = 10f;
 
-        public void Initialize(Double _startTime, Vector3 _startPos, Vector3 _direction, Constants.Owner _owner)
-        {
-            startTime = _startTime;
-            startPos = _startPos;
-            direction = _direction;
+        private BattleTickEventListener battleTickEventListener;
 
+        public void Initialize(Vector3 _startPos, Constants.Owner _owner)
+        {
+            startPos = _startPos;
+            
             owner = _owner;
 
-            transform.position = startPos;           
+            transform.position = startPos;
 
-            launched = true;
+
+            battleTickEventListener = gameObject.GetComponent<BattleTickEventListener>();
+            battleTickEventListener.tickCallback += HandleBattleTick;
+
         }
 
-        void Update()
+        void HandleBattleTick(int currentTick)
         {
-            if (launched)
+            Transform currentTransform = transform;
+            // move the projectile based on ticks, for now, fuck it
+            if (owner == Constants.Owner.Player1)
             {
-                float timePassed = (float)(PhotonNetwork.Time - startTime); 
-                transform.position = startPos + direction * speed * timePassed;
-
-                if (timePassed > lifetime)
-                {
-                    Destroy(gameObject);
-                }
-            }            
+                currentTransform.position = new Vector3(
+                    currentTransform.position.x + 0.2f,
+                    currentTransform.position.y,
+                    currentTransform.position.z
+                );
+            } else
+            {
+                currentTransform.position = new Vector3(
+                    // within 10 ticks, arrives at the next grid spot
+                    currentTransform.position.x - 0.2f,
+                    currentTransform.position.y,
+                    currentTransform.position.z
+                );
+            }
+            
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            // gotta check if its allowed to shoot this other thing
             
             Damageable d = other.GetComponent<Damageable>();
 
 
-            Debug.LogFormat("TRIGGER hitting damageable : otherOwner{0}   bulletOwner {1}", d.owner, owner);
-            if (d != null && d.owner != owner)
-            {
-                d.Damage(damage);
-
-                GameObject.Destroy(gameObject);
-            }
+            //Debug.LogFormat("TRIGGER hitting damageable : otherOwner{0}   bulletOwner {1}", d.owner, owner);
+            //if (d != null && d.owner != owner)
+            //{
+            //    GameObject.Destroy(gameObject);
+            //}
         }
     }
 }

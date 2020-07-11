@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 126510578}
   - component: {fileID: 8831637807920765437}
   - component: {fileID: 126510580}
-  - component: {fileID: 126510579}
   m_Layer: 0
   m_Name: BattleManager
   m_TagString: Untagged
@@ -51,6 +50,7 @@ MonoBehaviour:
     type: 3}
   playerPrefab: {fileID: 4611779920883957467, guid: 88c9c70d7e186c742a3caf46cc01c24b,
     type: 3}
+  loadingScreen: {fileID: 0}
   battleUI: {fileID: 0}
   battleConfig: {fileID: 11400000, guid: 8b9c1230bc3e8c542937bb03b6a5110d, type: 2}
   battleTickEvent: {fileID: 11400000, guid: 3da05f6cdd1cc3b44a6ef4ae9517b9cf, type: 2}
@@ -94,25 +94,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Event: {fileID: 11400000, guid: 7cc4292a2b8a35b4288d9ae98e0a887e, type: 2}
---- !u!114 &126510579
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6443372916835605073}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 1
-  OwnershipTransfer: 0
-  ObservedComponents:
-  - {fileID: 6443372916835605075}
-  viewIdField: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
