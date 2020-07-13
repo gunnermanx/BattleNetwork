@@ -6,8 +6,7 @@ using Sfs2X;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField]
-    private BattleManager battleManager;
+    [SerializeField] private BattleManager battleManager;
 
     private SmartFox sfs;
     private bool shuttingDown;
@@ -28,6 +27,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        Debug.Log("calling initialize battle0");
         battleManager.InitializeBattle();
     }
 
@@ -47,13 +47,13 @@ public class GameManager : MonoBehaviour
     private void RegisterSFSListeners()
     {
         sfs.AddEventListener(SFSEvent.CONNECTION_LOST, OnConnectionLost);
-        //sfs.AddEventListener(SFSEvent.USER_ENTER_ROOM, OnUserEnterRoom);
+        sfs.AddEventListener(SFSEvent.USER_ENTER_ROOM, OnUserEnterRoom);
         //sfs.AddEventListener(SFSEvent.USER_EXIT_ROOM, OnUserExitRoom);
     }
     private void UnregisterSFSListeners()
     {       
         sfs.RemoveEventListener(SFSEvent.CONNECTION_LOST, OnConnectionLost);
-        //sfs.RemoveEventListener(SFSEvent.USER_ENTER_ROOM, OnUserEnterRoom);
+        sfs.RemoveEventListener(SFSEvent.USER_ENTER_ROOM, OnUserEnterRoom);
         //sfs.RemoveEventListener(SFSEvent.USER_EXIT_ROOM, OnUserExitRoom);
     }
 
@@ -65,5 +65,10 @@ public class GameManager : MonoBehaviour
         {
             SceneManager.LoadScene("Connector");
         }
+    }
+
+    private void OnUserEnterRoom(BaseEvent evt)
+    {
+
     }
 }

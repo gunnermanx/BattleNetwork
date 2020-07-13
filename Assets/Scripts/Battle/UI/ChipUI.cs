@@ -8,11 +8,17 @@ namespace BattleNetwork.Battle.UI
     [RequireComponent(typeof(RectTransform))]
     public class ChipUI : MonoBehaviour, IDraggableUI
     {
+        [SerializeField] private Vector2 dragOffset;
+
+        public int Index { get; set; }
+
         private RectTransform rectTransform;
         private void Start()
         {
             rectTransform = gameObject.GetComponent<RectTransform>();
         }
+
+        
 
         public void TweenToZero(Action tweenComplete, float time)
         {
@@ -23,7 +29,7 @@ namespace BattleNetwork.Battle.UI
 
         public void DragEnded()
         {
-            TweenToZero(null, 0.10f);
+            TweenToZero(null, 0f);
         }
 
         public void DragStarted()
@@ -39,6 +45,11 @@ namespace BattleNetwork.Battle.UI
         public GameObject GetGameObject()
         {
             return gameObject;
+        }
+
+        public Vector2 Offset()
+        {
+            return dragOffset;
         }
     }
 }

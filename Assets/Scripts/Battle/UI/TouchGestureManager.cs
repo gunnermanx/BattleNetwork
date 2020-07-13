@@ -11,16 +11,12 @@ namespace BattleNetwork.Battle.UI
     [RequireComponent(typeof(FingersScript))]
     public class TouchGestureManager : MonoBehaviour
     {
-        [SerializeField]
-        private DraggedUIEvent draggedUIEvent;
-        [SerializeField]
-        private SwipeGestureEvent swipeGestureEvent;
-        [SerializeField]
-        private TapGestureEvent tapGestureEvent;
+        [SerializeField] private DraggedUIEvent draggedUIEvent;
+        [SerializeField] private SwipeGestureEvent swipeGestureEvent;
+        [SerializeField] private TapGestureEvent tapGestureEvent;
+        [SerializeField] private RectTransform swipeArea;
 
-        [SerializeField]
-        private RectTransform swipeArea;
-
+        [SerializeField] private bool debugLogs;
 
         private GraphicRaycaster graphicRaycaster;
 
@@ -55,7 +51,7 @@ namespace BattleNetwork.Battle.UI
         private void CreateLongPressGesture()
         {
             longPressGesture = new LongPressGestureRecognizer();
-            longPressGesture.MinimumDurationSeconds = 0.025f;
+            longPressGesture.MinimumDurationSeconds = 0f;
             longPressGesture.MaximumNumberOfTouchesToTrack = 1;
             longPressGesture.StateUpdated += LongPressGestureCallback;
             FingersScript.Instance.AddGesture(longPressGesture);
@@ -74,7 +70,7 @@ namespace BattleNetwork.Battle.UI
         {
             if (gesture.State == GestureRecognizerState.Ended)
             {
-                //Debug.LogFormat("Tapped at {0}, {1}", gesture.FocusX, gesture.FocusY);
+                LogFormat("Tapped at {0}, {1}", gesture.FocusX, gesture.FocusY);
                 tapGestureEvent.Raise(new Vector2(gesture.FocusX, gesture.FocusY));
             }
         }
@@ -98,22 +94,25 @@ namespace BattleNetwork.Battle.UI
         }
 
         private void SwipeGestureCallback(GestureRecognizer gesture)
-        {                       
+        {            
             if (gesture.State == GestureRecognizerState.Ended)
             {
-                bool validStart = RectTransformUtility.RectangleContainsScreenPoint(
-                    swipeArea, 
-                    new Vector2(swipeGesture.StartFocusX, swipeGesture.StartFocusY)
-                );
-                if (validStart)
-                {
+                //bool validStart = RectTransformUtility.RectangleContainsScreenPoint(
+                //    swipeArea, 
+                //    new Vector2(swipeGesture.StartFocusX, swipeGesture.StartFocusY)
+                //);
+                //if (validStart)
+                //{
+                    LogFormat("Ending swipe at : {0},{1}", swipeGesture.StartFocusX, swipeGesture.StartFocusY);
                     swipeGestureEvent.Raise(swipeGesture.EndDirection);
-                }
+                //}
             }
         }
 
         private void BeginDrag(float screenX, float screenY)
         {
+            LogFormat("BeginDrag at {0}, {1}", screenX, screenY);
+
             PointerEventData pointer = new PointerEventData(null);
             pointer.position = new Vector2(screenX, screenY);
 
@@ -143,12 +142,15 @@ namespace BattleNetwork.Battle.UI
         {
             if (draggedObject != null)
             {
+                LogFormat("DragTo at {0}, {1}, target: {2}", screenX, screenY, draggedObject.GetGameObject().name);
+
                 RectTransformUtility.ScreenPointToLocalPointInRectangle(
                     draggedObject.GetRectTransform(),
                     new Vector3(screenX, screenY, 0.0f),
                     null,
                     out var localPosition
                 );
+                localPosition = localPosition + draggedObject.Offset();
                 draggedObject.GetRectTransform().position = draggedObject.GetRectTransform().TransformPoint(localPosition);
             }            
         }
@@ -157,29 +159,42 @@ namespace BattleNetwork.Battle.UI
         {
             if (draggedObject != null)
             {
+                LogFormat("EndDrag speed {0}, {1}, target: {2}", velocityXScreen, velocityYScreen, draggedObject.GetGameObject().name);
+
                 draggedObject.DragEnded();
                 draggedUIEvent.Raise(DraggedUIEvent.State.Ended, draggedObject);
                 draggedObject = null;
             }
         }
 
-        private static bool? CaptureGestureHandler(GameObject obj)
+        private bool? CaptureGestureHandler(GameObject obj)
         {
             // I've named objects PassThrough* if the gesture should pass through and NoPass* if the gesture should be gobbled up, everything else gets default behavior
             if (obj.name.StartsWith("PassThrough"))
             {
-                // allow the pass through for any element named "PassThrough*"
+                // allow the pass through for any element named "PassThrough*"               
+                LogFormat("PassThrough {0}", obj.name);
                 return false;
             }
             else if (obj.name.StartsWith("NoPass"))
             {
                 // prevent the gesture from passing through, this is done on some of the buttons and the bottom text so that only
                 // the triple tap gesture can tap on it
+                LogFormat("Hit a NoPass object {0}", obj.name);
                 return true;
             }
 
+            LogFormat("Default {0}", obj.name);
             // fall-back to default behavior for anything else
-            return null;
+            return false;
+        }
+
+        private void LogFormat(string format, params object[] args)
+        {
+            if (debugLogs)
+            {
+                Debug.LogFormat(format, args);
+            }
         }
     }
 }

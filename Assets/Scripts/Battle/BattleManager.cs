@@ -8,6 +8,8 @@ using Sfs2X;
 using Sfs2X.Entities.Data;
 using Sfs2X.Requests;
 using Sfs2X.Core;
+using System.Collections;
+using UnityEngine.SceneManagement;
 
 namespace BattleNetwork.Battle
 {
@@ -22,8 +24,11 @@ namespace BattleNetwork.Battle
 
 
         [SerializeField] private GameObject loadingScreen;
+        [SerializeField] private GameObject readyInfoOverlay;
 
         [SerializeField] private BattleUI battleUI;
+
+        [SerializeField] private ResultScreen resultScreen;
 
         [SerializeField] private BattleConfigurationData battleConfig;
 
@@ -64,18 +69,24 @@ namespace BattleNetwork.Battle
             tapGestureEventListener.tapGestureEventCallback += HandleTapGestureEvent;
 
             sfs = SFSConnector.Instance.Connection;
-            sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnExtensionResponse);
-
+            if (sfs != null)
+            {
+                sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnExtensionResponse);
+            }            
 
             CreateArena();
             CreatePlayerUnits();
             CreateDeck();
             CreateUI();
 
-
-            loadingScreen.SetActive(false);
+            StartCoroutine(FakeLoad());
 
             //sfs.Send(new ExtensionRequest("r", new SFSObject(), sfs.LastJoinedRoom));
+        }
+        private IEnumerator FakeLoad()
+        {
+            yield return new WaitForSeconds(1.0f);
+            loadingScreen.SetActive(false);
         }
 
         private void CreateArena()
@@ -124,6 +135,7 @@ namespace BattleNetwork.Battle
                 if (currentTick == 1)
                 {
                     energyChangedEvent.Raise(energy, 10 * tickTime);
+                    readyInfoOverlay.SetActive(false);
                 }
             }            
         }
@@ -139,7 +151,14 @@ namespace BattleNetwork.Battle
             {
                 Debug.Log("chip played");
 
+
                 // TODO check and possibly play chips
+                ChipUI chipUI = draggable.GetGameObject().GetComponent<ChipUI>();
+                int temp_data = battleUI.GetChipDataForIndex(chipUI.Index);
+
+                // todo check costs
+
+                // cool? lets tell battleUI to cycle chip
 
                 // test cid
                 int cid = 0;
@@ -148,6 +167,14 @@ namespace BattleNetwork.Battle
                 obj.PutInt("cid", cid);
                 sfs.Send(new ExtensionRequest("ch", obj, sfs.LastJoinedRoom));
             }
+        }
+
+        public void TEMPFinishGame()
+        {
+            // TEMP NEED TO REFACTOR
+            sfs.RemoveAllEventListeners();
+            sfs.Send(new LeaveRoomRequest());
+            SceneManager.LoadScene("Home");
         }
 
         private void HandleSwipeGestureEvent(SwipeGestureRecognizerDirection direction)
@@ -187,7 +214,6 @@ namespace BattleNetwork.Battle
 
         private void HandleTapGestureEvent(Vector2 screenPos)
         {
-            //Debug.Log("sending basic attack");
             SFSObject obj = new SFSObject();
             sfs.Send(new ExtensionRequest("ba", obj, sfs.LastJoinedRoom));
         }
@@ -201,6 +227,16 @@ namespace BattleNetwork.Battle
             {
                 case "tick":
                     CommandsReceived(dataObject);
+                    break;
+                case "pv":
+                    int winner = dataObject.GetInt("pid");
+                    if (winner == sfs.MySelf.PlayerId)
+                    {
+                        resultScreen.SetWon();
+                    } else
+                    {
+                        resultScreen.SetLost();
+                    }                    
                     break;
             }
         }
@@ -264,7 +300,7 @@ namespace BattleNetwork.Battle
                     int chipId = cmd.GetInt(2);
 
                     arena.PlayChip(playerId, chipId);
-                }
+                }                
             }
             
         }

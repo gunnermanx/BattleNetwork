@@ -103,7 +103,7 @@ namespace BattleNetwork.Battle
             GameObject projectile = Instantiate(
                 Resources.Load("TestStraightProjectile", typeof(GameObject))
             ) as GameObject;
-            BasicProjectile p = projectile.GetComponent<BasicProjectile>();
+            StraightProjectile p = projectile.GetComponent<StraightProjectile>();
 
             Vector3 position = Vector3.zero;
             Constants.Owner owner = Constants.Owner.None;

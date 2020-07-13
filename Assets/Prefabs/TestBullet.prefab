@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 8343962295932349279}
   - component: {fileID: 8343962295932349278}
   - component: {fileID: 8343962295932349277}
-  - component: {fileID: -2075527004211646927}
   - component: {fileID: 8946039387259069715}
+  - component: {fileID: 1355462882263048065}
   m_Layer: 9
   m_Name: TestBullet
   m_TagString: Untagged
@@ -96,18 +96,6 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
---- !u!114 &-2075527004211646927
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8343962295932349276}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d6063e5212f27314786ed9772cda3225, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!54 &8946039387259069715
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -124,3 +112,15 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1355462882263048065
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8343962295932349276}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57fb2a4ad8ca2e94ea795341c03f2294, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

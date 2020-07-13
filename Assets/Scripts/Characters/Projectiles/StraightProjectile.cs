@@ -5,7 +5,7 @@ using BattleNetwork.Events;
 
 namespace BattleNetwork.Characters
 {
-    public class BasicProjectile : MonoBehaviour
+    public class StraightProjectile : MonoBehaviour
     {
         private Double startTime;
         private Vector3 startPos;
@@ -66,10 +66,10 @@ namespace BattleNetwork.Characters
 
 
             //Debug.LogFormat("TRIGGER hitting damageable : otherOwner{0}   bulletOwner {1}", d.owner, owner);
-            //if (d != null && d.owner != owner)
-            //{
-            //    GameObject.Destroy(gameObject);
-            //}
+            if (d != null && d.owner != owner)
+            {
+                GameObject.Destroy(gameObject);
+            }
         }
     }
 }
