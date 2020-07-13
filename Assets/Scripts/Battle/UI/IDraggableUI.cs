@@ -8,5 +8,6 @@ namespace BattleNetwork.Battle.UI
         void DragStarted();
         void DragEnded();
         GameObject GetGameObject();
+        Vector2 Offset();
     }
 }

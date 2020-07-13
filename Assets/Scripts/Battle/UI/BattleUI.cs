@@ -10,6 +10,7 @@ namespace BattleNetwork.Battle.UI
 
         [SerializeField] private ChipDockUI chipDockUI;
         [SerializeField] private EnergyBar energyBar;
+        [SerializeField] private Transform dyanmicUIParent;
 
         [SerializeField] private BattleConfigurationData battleConfig;
 
@@ -23,7 +24,10 @@ namespace BattleNetwork.Battle.UI
             draggedUIEventListener.draggedUIEventCallback += HandleDraggedUIEvent;
             playerUnitCreatedEventListener.playerCreatedCallback += HandlePlayerUnitCreatedEvent;
 
-            energyBar.InitializeWithMaxAndInterval(battleConfig.maxEnergy, battleConfig.ticksPerEnergy);                       
+            energyBar.InitializeWithMaxAndInterval(0, battleConfig.maxEnergy);
+
+            // TODO
+            chipDockUI.TestInitializeDock();
         }
 
         private void HandleEnergyChangedEvent(int currentEnergy, float timeTillNextEnergySecs)
@@ -37,11 +41,13 @@ namespace BattleNetwork.Battle.UI
             {
                 if (state == DraggedUIEvent.State.Started)
                 {
-                    chipDockUI.Minimize();
+                    //chipDockUI.Minimize();
                 }
                 else if (state == DraggedUIEvent.State.Ended)
                 {
-                    chipDockUI.Maximize();
+                    //chipDockUI.Maximize();
+
+                    
                 }
             }            
         }
@@ -49,9 +55,14 @@ namespace BattleNetwork.Battle.UI
         private void HandlePlayerUnitCreatedEvent(PlayerUnit player)
         {
             Damageable damageable = player.gameObject.GetComponent<Damageable>();
-            GameObject hpDisplay = GameObject.Instantiate(hpDisplayPrefab, transform);
+            GameObject hpDisplay = GameObject.Instantiate(hpDisplayPrefab, dyanmicUIParent);
             hpDisplay.GetComponent<UnitHPDisplay>()
                 .AttachToIDamageable(damageable, new Vector2(0f, -20f));
+        }
+
+        public int GetChipDataForIndex(int i)
+        {
+            return chipDockUI.GetChipDataForIndex(i);
         }
     }
 }

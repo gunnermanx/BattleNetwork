@@ -1,16 +1,21 @@
 ﻿using UnityEngine;
-using Photon.Pun;
 using BattleNetwork.Characters;
 using BattleNetwork.Events;
 using System;
 using DigitalRubyShared;
 using BattleNetwork.Battle.UI;
+using Sfs2X;
+using Sfs2X.Entities.Data;
+using Sfs2X.Requests;
+using Sfs2X.Core;
+using System.Collections;
+using UnityEngine.SceneManagement;
 
 namespace BattleNetwork.Battle
 {
 
     [RequireComponent(typeof(DraggedUIEventListener))]
-    public class BattleManager : MonoBehaviour, IPunObservable
+    public class BattleManager : MonoBehaviour
     {
         // temporary, we want to load it dynamically later
         [SerializeField] private GameObject arenaPrefab;
@@ -18,7 +23,12 @@ namespace BattleNetwork.Battle
         [SerializeField] private GameObject playerPrefab;
 
 
-        [SerializeField] private BattleUI battleUI;       
+        [SerializeField] private GameObject loadingScreen;
+        [SerializeField] private GameObject readyInfoOverlay;
+
+        [SerializeField] private BattleUI battleUI;
+
+        [SerializeField] private ResultScreen resultScreen;
 
         [SerializeField] private BattleConfigurationData battleConfig;
 
@@ -28,19 +38,26 @@ namespace BattleNetwork.Battle
 
         private DraggedUIEventListener draggedUIEventListener;
         private SwipeGestureEventListener swipeGestureEventListener;
-        private TapGestureEventListener tapGestureEventListener;        
+        private TapGestureEventListener tapGestureEventListener;
 
-        private int currentTick = -1;
-        private int sentTick = -1;
+        private int currentTick = 0;
+        private int serverTick = 0;
+
         private int energy = 0;
 
-        private readonly float tickTime = 0.5f;
+        private readonly float tickTime = 0.05f;
 
         private Arena arena;
 
-        private PlayerUnit localPlayerUnit;        
-        
-        private void Start()
+        private PlayerUnit p1PlayerUnit;
+        private PlayerUnit p2PlayerUnit;
+
+        private readonly int p1PlayerUnitId = 1;
+        private readonly int p2PlayerUnitId = 2;
+
+        private SmartFox sfs;
+
+        public void InitializeBattle()
         {
             draggedUIEventListener = gameObject.GetComponent<DraggedUIEventListener>();
             draggedUIEventListener.draggedUIEventCallback += HandleDraggedUIEvent;
@@ -50,44 +67,33 @@ namespace BattleNetwork.Battle
 
             tapGestureEventListener = gameObject.GetComponent<TapGestureEventListener>();
             tapGestureEventListener.tapGestureEventCallback += HandleTapGestureEvent;
-        }
 
-        public void StartBattle()
-        {            
-            CreateArena();
-            CreatePlayer();
-            CreateDeck();
-
-            CreateUI();
-            
-            // only the master client will update the tick
-            if (PhotonNetwork.IsMasterClient)
+            sfs = SFSConnector.Instance.Connection;
+            if (sfs != null)
             {
-                InvokeRepeating(nameof(MasterClientTick), 0f, tickTime);
+                sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnExtensionResponse);
             }            
+
+            CreateArena();
+            CreatePlayerUnits();
+            CreateDeck();
+            CreateUI();
+
+            StartCoroutine(FakeLoad());
+
+            //sfs.Send(new ExtensionRequest("r", new SFSObject(), sfs.LastJoinedRoom));
         }
-
-
+        private IEnumerator FakeLoad()
+        {
+            yield return new WaitForSeconds(1.0f);
+            loadingScreen.SetActive(false);
+        }
 
         private void CreateArena()
         {
             GameObject arenaGO = GameObject.Instantiate(arenaPrefab);
             arena = arenaGO.GetComponent<Arena>();
             arena.Initialize();
-        }
-
-        private void CreatePlayer()
-        {
-            if (localPlayerUnit == null)
-            {              
-                // we're in a room. spawn a character for the local player. it gets synced by using PhotonNetwork.Instantiate                
-                GameObject localPlayerUnitGO = PhotonNetwork.Instantiate(playerPrefab.name, Vector3.zero, Quaternion.identity, 0);
-
-                // "Place" the Player in the arena
-                Constants.Owner owner = PhotonNetwork.IsMasterClient ? Constants.Owner.Player1 : Constants.Owner.Player2;                
-                localPlayerUnit = localPlayerUnitGO.GetComponent<PlayerUnit>();
-                arena.PlacePlayerUnit(localPlayerUnit, owner);
-            }
         }
 
 
@@ -103,90 +109,209 @@ namespace BattleNetwork.Battle
 
         }
 
-
-        // Only the master client updates the tick
-        private void MasterClientTick()
+        private void CreatePlayerUnits()
         {
-            currentTick++;
-            HandleTickUpdated(currentTick);
+            // clients should already have data about starting positions and player unit data...
+            // do something here            
+            GameObject p1PlayerUnitGO = GameObject.Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
+            p1PlayerUnit = p1PlayerUnitGO.GetComponent<PlayerUnit>();
+            p1PlayerUnit.id = p1PlayerUnitId;
+            arena.PlacePlayerUnit(p1PlayerUnit, Constants.Owner.Player1);
+
+            GameObject p2PlayerUnitGO = GameObject.Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
+            p2PlayerUnit = p2PlayerUnitGO.GetComponent<PlayerUnit>();
+            p2PlayerUnit.id = p2PlayerUnitId;
+            arena.PlacePlayerUnit(p2PlayerUnit, Constants.Owner.Player2);
         }
 
-        private void HandleTickUpdated(int tick)
+        private void Update()
         {
-            UpdateEnergy();
-            battleTickEvent.Raise(currentTick);
-        }
+            if (currentTick + 1 <= serverTick)
+            {
+                currentTick++;
+                battleTickEvent.Raise(currentTick);
 
-        private void UpdateEnergy()
-        {
-            if (currentTick == 0)
-            {
-                energyChangedEvent.Raise(energy, (float)battleConfig.ticksPerEnergy * tickTime);
-            }
-            else if (currentTick % battleConfig.ticksPerEnergy == 0)
-            {
-                int newEnergy = energy + 1;
-                newEnergy = Math.Min(battleConfig.maxEnergy, newEnergy);
-                if (newEnergy != energy)
+                // figure out better way later to init energy bar value + movement
+                if (currentTick == 1)
                 {
-                    energy = newEnergy;
-                    energyChangedEvent.Raise(energy, (float)battleConfig.ticksPerEnergy * tickTime);
+                    energyChangedEvent.Raise(energy, 10 * tickTime);
+                    readyInfoOverlay.SetActive(false);
                 }
-            }
-        } 
-        
+            }            
+        }
+
         private void HandleDraggedUIEvent(DraggedUIEvent.State state, IDraggableUI draggable)
         {
             if (state == DraggedUIEvent.State.Started)
             {
-                
+
             }
 
             if (state == DraggedUIEvent.State.Ended)
             {
+                Debug.Log("chip played");
+
+
                 // TODO check and possibly play chips
-            }            
+                ChipUI chipUI = draggable.GetGameObject().GetComponent<ChipUI>();
+                int temp_data = battleUI.GetChipDataForIndex(chipUI.Index);
+
+                // todo check costs
+
+                // cool? lets tell battleUI to cycle chip
+
+                // test cid
+                int cid = 0;
+
+                SFSObject obj = new SFSObject();
+                obj.PutInt("cid", cid);
+                sfs.Send(new ExtensionRequest("ch", obj, sfs.LastJoinedRoom));
+            }
+        }
+
+        public void TEMPFinishGame()
+        {
+            // TEMP NEED TO REFACTOR
+            sfs.RemoveAllEventListeners();
+            sfs.Send(new LeaveRoomRequest());
+            SceneManager.LoadScene("Home");
         }
 
         private void HandleSwipeGestureEvent(SwipeGestureRecognizerDirection direction)
         {
+            byte dir;
             switch (direction)
             {
                 case SwipeGestureRecognizerDirection.Up:
-                    arena.TryMoveUp(localPlayerUnit);
+                    dir = (byte)'u';
+                    //arena.TryMoveUp(localPlayerUnit);
                     break;
                 case SwipeGestureRecognizerDirection.Down:
-                    arena.TryMoveDown(localPlayerUnit);
+                    dir = (byte)'d';
+                    //arena.TryMoveDown(localPlayerUnit);
                     break;
                 case SwipeGestureRecognizerDirection.Left:
-                    arena.TryMoveLeft(localPlayerUnit);
+                    dir = (byte)'l';
+                    //arena.TryMoveLeft(localPlayerUnit);
                     break;
                 case SwipeGestureRecognizerDirection.Right:
-                    arena.TryMoveRight(localPlayerUnit);
+                    dir = (byte)'r';
+                    //arena.TryMoveRight(localPlayerUnit);
                     break;
+                default:
+                    dir = (byte)'0';
+                    break;
+            }
+
+            if (dir != (byte)'0')
+            {
+                //Debug.LogFormat("Sending swipe {0}", direction);
+                SFSObject obj = new SFSObject();                
+                obj.PutByte("d", dir);
+                sfs.Send(new ExtensionRequest("m", obj, sfs.LastJoinedRoom));
             }
         }
 
         private void HandleTapGestureEvent(Vector2 screenPos)
         {
-            localPlayerUnit.BasicAttack();
+            SFSObject obj = new SFSObject();
+            sfs.Send(new ExtensionRequest("ba", obj, sfs.LastJoinedRoom));
         }
 
-        public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+        public void OnExtensionResponse(BaseEvent evt)
         {
-            if (PhotonNetwork.IsMasterClient)
+            string cmd = (string)evt.Params["cmd"];
+            SFSObject dataObject = (SFSObject)evt.Params["params"];
+
+            switch (cmd)
             {
-                if (currentTick != sentTick)
-                {
-                    stream.SendNext(currentTick);
-                    sentTick = currentTick;
-                }                
-            } else
-            {
-                currentTick = (int)stream.ReceiveNext();
-                HandleTickUpdated(currentTick);
+                case "tick":
+                    CommandsReceived(dataObject);
+                    break;
+                case "pv":
+                    int winner = dataObject.GetInt("pid");
+                    if (winner == sfs.MySelf.PlayerId)
+                    {
+                        resultScreen.SetWon();
+                    } else
+                    {
+                        resultScreen.SetLost();
+                    }                    
+                    break;
             }
         }
 
+        private void CommandsReceived(SFSObject dataObject)
+        {
+            int latestTick = dataObject.GetInt("t");
+            serverTick = latestTick;
+
+            ISFSArray cmds = dataObject.GetSFSArray("c");
+
+            if (cmds.Count > 0)
+                Debug.LogFormat("At tick {0}, received {1} cmds", latestTick, cmds.Count);
+
+            foreach (ISFSArray cmd in cmds)
+            {
+                byte cmdId = cmd.GetByte(0);
+                // create a function to multiplex to different parsers
+
+                //Debug.LogFormat("    processing cmd with id == {0}", cmdId);
+
+                // move cmd
+                if (cmdId == (byte) 0)
+                {
+                    int unitId = cmd.GetInt(1);
+                    int x = cmd.GetInt(2);
+                    int y = cmd.GetInt(3);
+
+                    arena.ServerMoveUnit(unitId, x, y);
+
+                    Debug.LogFormat("    received move command from server at tick {0}: move {1} to [{2},{3}]", latestTick, unitId, x, y);
+                }
+                // damage dealt cmd
+                else if (cmdId == (byte) 1)
+                {
+                    int unitId = cmd.GetInt(1);
+                    int damage = cmd.GetInt(2);
+
+                    Debug.LogFormat("unit {0} was damaged for {1}", unitId, damage);
+
+                    arena.ServerDamageUnit(unitId, damage);
+                }
+                // energy changed event
+                else if (cmdId == (byte) 2)
+                {
+                    int playerId = cmd.GetInt(1);
+                    int deltaEnergy = cmd.GetInt(2);
+
+                    if (sfs.MySelf.PlayerId == playerId)
+                    {
+                        energy = energy += deltaEnergy;
+                        energyChangedEvent.Raise(energy, 10 * tickTime);
+                    }                    
+                }
+                // spawn projectile event
+                else if (cmdId == (byte) 3)
+                {
+                    Debug.Log("received command to spawn projectile");
+
+                    int playerId = cmd.GetInt(1);
+                    int chipId = cmd.GetInt(2);
+
+                    arena.PlayChip(playerId, chipId);
+                }                
+            }
+            
+        }
+
+        private bool IsPlayer1()
+        {
+            if(sfs.MySelf.PlayerId == 1)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }

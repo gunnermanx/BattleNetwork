@@ -13,9 +13,10 @@ GameObject:
   - component: {fileID: 8343962295932349278}
   - component: {fileID: 8343962295932349277}
   - component: {fileID: 8946039387259069715}
-  - component: {fileID: 1355462882263048065}
+  - component: {fileID: 1772351948527139812}
+  - component: {fileID: 4912719204792458905}
   m_Layer: 9
-  m_Name: TestBullet
+  m_Name: TestStraightProjectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30,7 +31,7 @@ Transform:
   m_GameObject: {fileID: 8343962295932349276}
   m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
   m_LocalPosition: {x: 1.56, y: 0, z: 0}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
+  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -112,7 +113,20 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &1355462882263048065
+--- !u!114 &1772351948527139812
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8343962295932349276}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d5d3516aa6bceb42ab1d6fa9458f253, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Event: {fileID: 11400000, guid: 3da05f6cdd1cc3b44a6ef4ae9517b9cf, type: 2}
+--- !u!114 &4912719204792458905
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

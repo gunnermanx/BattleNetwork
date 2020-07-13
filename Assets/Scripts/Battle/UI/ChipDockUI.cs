@@ -13,6 +13,7 @@ namespace BattleNetwork.Battle.UI
         [SerializeField] private float rightPadding;
         [SerializeField] private float chipSpacing;
         [SerializeField] private float chipWidth;
+        [SerializeField] private float anchorY;
 
         [SerializeField] private float minimizeY;
         [SerializeField] private float minimizeTweenTime;
@@ -79,6 +80,13 @@ namespace BattleNetwork.Battle.UI
             InitializeDockWidth(numChips);
             CreateChipAnchors(numChips);
         }
+
+
+        public int GetChipDataForIndex(int i)
+        {
+            // read from some chip data
+            return 0;
+        } 
 
         public void Minimize()
         {
@@ -163,12 +171,12 @@ namespace BattleNetwork.Battle.UI
                 GameObject anchor = new GameObject("cardAnchor" + i, typeof(RectTransform));
 
                 RectTransform rt = anchor.GetComponent<RectTransform>();
-                rt.parent = chipDock;
+                rt.SetParent(chipDock, false);
                 rt.anchorMin = new Vector2(0f, 0f);
                 rt.anchorMax = new Vector2(0f, 0f);
                 rt.pivot = new Vector2(0f, 0f);
 
-                rt.anchoredPosition = new Vector3(leftSpacing, 25f, 0f);
+                rt.anchoredPosition = new Vector3(leftSpacing, anchorY, 0f);
 
                 leftSpacing += chipWidth + chipSpacing;
 
@@ -178,8 +186,11 @@ namespace BattleNetwork.Battle.UI
 
         public void AddChip(int index)
         {
-            GameObject chip = GameObject.Instantiate(chipUIPrefab.gameObject, anchors[index]);
-            dockedChips[index] = chip.GetComponent<ChipUI>();
+            GameObject chip = GameObject.Instantiate(chipUIPrefab.gameObject);
+            chip.transform.SetParent(anchors[index], false);
+            ChipUI chipUI = chip.GetComponent<ChipUI>();
+            chipUI.Index = index;
+            dockedChips[index] = chipUI;
         }
 
         public void RemoveChipAt(int index)

@@ -13,17 +13,22 @@ public class EnergyBar : MonoBehaviour
 
     private float progressRate = 0f;
 
+    private bool canUpdate;
 
-    public void InitializeWithMaxAndInterval(int max, float interval)
+    public void InitializeWithMaxAndInterval(int current, int max)
     {
         progressionSlider.maxValue = max;
         actualSlider.maxValue = max;
-
-        progressRate = 1f / interval;   // we always want to progress 1 unit
+        SetToValue(current, 0);
     }
 
     public void SetToValue(int newValue, float timeTillNextValue)
     {
+        if (timeTillNextValue != 0)
+        {
+            canUpdate = true;
+        }
+
         actualSlider.value = newValue;
         progressionSlider.value = newValue;
         progressRate = 1f / timeTillNextValue;
@@ -32,10 +37,13 @@ public class EnergyBar : MonoBehaviour
 
     private void Update()
     {
-        float progressionDelta = Time.deltaTime * progressRate;
-        float progressionValue = progressionSlider.value + progressionDelta;
-        float progressionCap = actualSlider.value + 1;
+        if (canUpdate)
+        {
+            float progressionDelta = Time.deltaTime * progressRate;
+            float progressionValue = progressionSlider.value + progressionDelta;
+            float progressionCap = actualSlider.value + 1;
 
-        progressionSlider.value = Mathf.Clamp(progressionValue, 0f, progressionCap);
+            progressionSlider.value = Mathf.Clamp(progressionValue, 0f, progressionCap);
+        }        
     }
 }
