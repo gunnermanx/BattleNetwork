@@ -55,6 +55,10 @@ namespace BattleNetwork.Battle
         private readonly int p1PlayerUnitId = 1;
         private readonly int p2PlayerUnitId = 2;
 
+
+        // TEST
+        private int ticksPerEnergy = 40;
+
         private SmartFox sfs;
 
         public void InitializeBattle()
@@ -134,7 +138,7 @@ namespace BattleNetwork.Battle
                 // figure out better way later to init energy bar value + movement
                 if (currentTick == 1)
                 {
-                    energyChangedEvent.Raise(energy, 10 * tickTime);
+                    energyChangedEvent.Raise(energy, ticksPerEnergy * tickTime);
                     readyInfoOverlay.SetActive(false);
                 }
             }            
@@ -183,20 +187,16 @@ namespace BattleNetwork.Battle
             switch (direction)
             {
                 case SwipeGestureRecognizerDirection.Up:
-                    dir = (byte)'u';
-                    //arena.TryMoveUp(localPlayerUnit);
+                    dir = (byte)'u';                    
                     break;
                 case SwipeGestureRecognizerDirection.Down:
-                    dir = (byte)'d';
-                    //arena.TryMoveDown(localPlayerUnit);
+                    dir = (byte)'d';                    
                     break;
                 case SwipeGestureRecognizerDirection.Left:
-                    dir = (byte)'l';
-                    //arena.TryMoveLeft(localPlayerUnit);
+                    dir = (byte)'l';                    
                     break;
                 case SwipeGestureRecognizerDirection.Right:
                     dir = (byte)'r';
-                    //arena.TryMoveRight(localPlayerUnit);
                     break;
                 default:
                     dir = (byte)'0';
@@ -205,6 +205,18 @@ namespace BattleNetwork.Battle
 
             if (dir != (byte)'0')
             {
+                if (currentTick >= 1)
+                {
+                    if (IsPlayer1())
+                    {
+                        arena.TryMove(p1PlayerUnit, direction);
+                    }
+                    else
+                    {
+                        arena.TryMove(p2PlayerUnit, direction);
+                    }
+                }                
+
                 //Debug.LogFormat("Sending swipe {0}", direction);
                 SFSObject obj = new SFSObject();                
                 obj.PutByte("d", dir);
@@ -287,8 +299,9 @@ namespace BattleNetwork.Battle
 
                     if (sfs.MySelf.PlayerId == playerId)
                     {
-                        energy = energy += deltaEnergy;
-                        energyChangedEvent.Raise(energy, 10 * tickTime);
+                        Debug.LogFormat("change in energy, previous {0}, after: {1}", energy, energy + deltaEnergy);
+                        energy = energy + deltaEnergy;
+                        energyChangedEvent.Raise(energy, ticksPerEnergy * tickTime);
                     }                    
                 }
                 // spawn projectile event

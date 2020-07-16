@@ -20,13 +20,14 @@ public class LoginController : MonoBehaviour
     [SerializeField] private Text debugText;
 
     //private string defaultHost = "3.12.181.63";
-    private string defaultHost = "127.0.0.1";
+    private string defaultHost = "172.16.10.180";
     private string defaultPort = "9933";
 
     private void Start()
     {
         hostInputField.text = defaultHost;
         portInputField.text = defaultPort;
+        usernameInputField.text = Guid.NewGuid().ToString();
 
         debugText.text = "";
 

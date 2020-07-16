@@ -34,10 +34,10 @@ namespace BattleNetwork.Battle.UI
 
         private void SetupTouchGestures()
         {
-            CreateTapGesture();
-            CreateSwipeGestures();
             CreateLongPressGesture();
-
+            CreateSwipeGestures();
+            CreateTapGesture();
+            
             FingersScript.Instance.CaptureGestureHandler = CaptureGestureHandler;
         }
 
@@ -45,6 +45,7 @@ namespace BattleNetwork.Battle.UI
         {
             tapGesture = new TapGestureRecognizer();
             tapGesture.StateUpdated += TapGestureCallback;
+            //tapGesture.RequireGestureRecognizerToFail = longPressGesture;
             FingersScript.Instance.AddGesture(tapGesture);
         }
 
@@ -53,15 +54,17 @@ namespace BattleNetwork.Battle.UI
             longPressGesture = new LongPressGestureRecognizer();
             longPressGesture.MinimumDurationSeconds = 0f;
             longPressGesture.MaximumNumberOfTouchesToTrack = 1;
+            //longPressGesture.RequireGestureRecognizerToFail = tapGesture;
             longPressGesture.StateUpdated += LongPressGestureCallback;
             FingersScript.Instance.AddGesture(longPressGesture);
         }
         private void CreateSwipeGestures()
         {
             swipeGesture = new SwipeGestureRecognizer();
-            swipeGesture.MinimumDistanceUnits = 0.5f;
-            swipeGesture.MinimumSpeedUnits = 2.0f;
+            swipeGesture.MinimumDistanceUnits = 0.2f;
+            swipeGesture.MinimumSpeedUnits = 1f;
             swipeGesture.Direction = SwipeGestureRecognizerDirection.Any;
+            swipeGesture.DirectionThreshold = 1.2f;
             swipeGesture.StateUpdated += SwipeGestureCallback;
             FingersScript.Instance.AddGesture(swipeGesture);
         }
@@ -87,7 +90,7 @@ namespace BattleNetwork.Battle.UI
                     break;
                 case GestureRecognizerState.Ended:
                     EndDrag(longPressGesture.VelocityX, longPressGesture.VelocityY);
-                    break;
+                    break;                                
                 default:
                     break;
             }
@@ -117,6 +120,7 @@ namespace BattleNetwork.Battle.UI
             pointer.position = new Vector2(screenX, screenY);
 
             List<RaycastResult> hits = new List<RaycastResult>();
+            bool foundDraggable = false;
             graphicRaycaster.Raycast(pointer, hits);
             if (hits.Count > 0)
             {
@@ -125,6 +129,7 @@ namespace BattleNetwork.Battle.UI
                     IDraggableUI draggable = hits[i].gameObject.GetComponent<IDraggableUI>();
                     if (draggable != null)
                     {
+                        foundDraggable = true;
                         draggedObject = draggable;                        
                         draggable.DragStarted();
                         draggedUIEvent.Raise(DraggedUIEvent.State.Started, draggable);
@@ -132,8 +137,9 @@ namespace BattleNetwork.Battle.UI
                     }
                 }
             }
-            else
-            {
+
+            if (!foundDraggable)
+            {              
                 longPressGesture.Reset();
             }
         }
@@ -168,11 +174,12 @@ namespace BattleNetwork.Battle.UI
         }
 
         private bool? CaptureGestureHandler(GameObject obj)
-        {
+        {        
             // I've named objects PassThrough* if the gesture should pass through and NoPass* if the gesture should be gobbled up, everything else gets default behavior
             if (obj.name.StartsWith("PassThrough"))
             {
-                // allow the pass through for any element named "PassThrough*"               
+
+                // allow the pass through for any element named "PassThrough*"
                 LogFormat("PassThrough {0}", obj.name);
                 return false;
             }
