@@ -258,6 +258,8 @@ namespace BattleNetwork.Battle
             int latestTick = dataObject.GetInt("t");
             serverTick = latestTick;
 
+            //Debug.LogFormat("tick update: {0}", serverTick);
+
             ISFSArray cmds = dataObject.GetSFSArray("c");
 
             if (cmds.Count > 0)
@@ -296,6 +298,8 @@ namespace BattleNetwork.Battle
                 {
                     int playerId = cmd.GetInt(1);
                     int deltaEnergy = cmd.GetInt(2);
+
+                    //Debug.LogFormat("energy changed event received for : %d", playerId);
 
                     if (sfs.MySelf.PlayerId == playerId)
                     {
