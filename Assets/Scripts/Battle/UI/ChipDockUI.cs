@@ -31,6 +31,8 @@ namespace BattleNetwork.Battle.UI
         private ChipUI[] dockedChips;
         private RectTransform[] anchors;
 
+        private int lastRemovedIndex;
+
 
         private void Start()
         {
@@ -163,10 +165,16 @@ namespace BattleNetwork.Battle.UI
             dockedChips[index] = chipUI;
         }
 
+        public void AddChipAtLastIndex(short chipId)
+        {
+            AddChip(lastRemovedIndex, chipId);
+        }
+
         public void RemoveChipAt(int index)
         {
             GameObject.DestroyImmediate(dockedChips[index].gameObject);
             dockedChips[index] = null;
+            lastRemovedIndex = index;
         }
 
         public void ShuffleChipsForward(int removedIndex)

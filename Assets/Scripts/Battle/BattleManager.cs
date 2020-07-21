@@ -138,12 +138,18 @@ namespace BattleNetwork.Battle
 
             if (state == DraggedUIEvent.State.Ended)
             {
-                // TODO check and possibly play chips
-                ChipUI chipUI = draggable.GetGameObject().GetComponent<ChipUI>();               
-                SFSObject obj = new SFSObject();
-                obj.PutShort("cid", chipUI.cid);
-                Debug.LogFormat("chip played {0}", chipUI.cid);
-                sfs.Send(new ExtensionRequest("ch", obj, sfs.LastJoinedRoom));
+                // TEMP
+                if (energy >= 2)
+                {
+                    // TODO check and possibly play chips
+                    ChipUI chipUI = draggable.GetGameObject().GetComponent<ChipUI>();
+                    SFSObject obj = new SFSObject();
+                    obj.PutShort("cid", chipUI.cid);
+                    Debug.LogFormat("chip played {0}", chipUI.cid);
+                    sfs.Send(new ExtensionRequest("ch", obj, sfs.LastJoinedRoom));
+
+                    battleUI.ChipPlayedAtIndex(chipUI.Index);
+                }
             }
         }
 
@@ -215,7 +221,6 @@ namespace BattleNetwork.Battle
                     CommandsReceived(dataObject);
                     break;
                 case "hand":
-                    Debug.Log("RECEIVED HAND!");
                     ISFSArray chips = dataObject.GetSFSArray("chips");
                     short[] chipsArr = new short[4];
                     chipsArr[0] = chips.GetShort(0);
@@ -253,8 +258,6 @@ namespace BattleNetwork.Battle
             {
                 byte cmdId = cmd.GetByte(0);
                 // create a function to multiplex to different parsers
-
-                //Debug.LogFormat("    processing cmd with id == {0}", cmdId);
 
                 // move cmd
                 if (cmdId == (byte) 0)
@@ -301,7 +304,16 @@ namespace BattleNetwork.Battle
                     int chipId = cmd.GetInt(2);
 
                     arena.PlayChip(playerId, chipId);
-                }                
+                }
+                // chip drawn event
+                else if (cmdId == (byte) 4)
+                {
+                    Debug.Log("chip drawn");
+
+                    short chipId = cmd.GetShort(1);
+
+                    battleUI.AddChipAtLastRemoved(chipId);
+                }
             }
             
         }

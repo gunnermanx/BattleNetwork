@@ -71,5 +71,15 @@ namespace BattleNetwork.Battle.UI
                 chipDockUI.AddChip(i, chipIds[i]);
             }            
         }
+
+        public void ChipPlayedAtIndex(int i)
+        {
+            chipDockUI.RemoveChipAt(i);
+        }
+
+        public void AddChipAtLastRemoved(short chipId)
+        {
+            chipDockUI.AddChipAtLastIndex(chipId);
+        }
     }
 }
