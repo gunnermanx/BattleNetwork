@@ -5,7 +5,8 @@ using UnityEngine;
 namespace BattleNetwork.Battle.UI
 {
     public class ChipDockUI : MonoBehaviour
-    {   
+    {
+        [SerializeField] private ChipVisualData chipVisualsDatabase;
         [SerializeField] private ChipUI chipUIPrefab;
         [SerializeField] private RectTransform chipDock;
 
@@ -29,38 +30,6 @@ namespace BattleNetwork.Battle.UI
 
         private ChipUI[] dockedChips;
         private RectTransform[] anchors;
-
-        [ContextMenu("Test dock")]
-        public void TestInitializeDock()
-        {
-            InitializeChipDockUI(4);
-
-            AddChip(0);
-            AddChip(1);
-            AddChip(2);
-            AddChip(3);
-        }
-
-        [ContextMenu("Test remove chip at 0")]
-        public void Test2()
-        {
-            RemoveChipAt(0);
-            ShuffleChipsForward(0);
-            AddChip(3);
-        }
-
-        [ContextMenu("Test minimize")]
-        public void TestMinimize()
-        {
-            Minimize();
-        }
-
-        [ContextMenu("Test maximize")]
-        public void TestMaximize()
-        {
-            Maximize();
-        }
-
 
 
         private void Start()
@@ -184,12 +153,13 @@ namespace BattleNetwork.Battle.UI
             }
         }
 
-        public void AddChip(int index)
+        public void AddChip(int index, short chipId)
         {
             GameObject chip = GameObject.Instantiate(chipUIPrefab.gameObject);
             chip.transform.SetParent(anchors[index], false);
             ChipUI chipUI = chip.GetComponent<ChipUI>();
             chipUI.Index = index;
+            chipUI.Initialize(chipId, chipVisualsDatabase.GetCachedData()[chipId]);
             dockedChips[index] = chipUI;
         }
 

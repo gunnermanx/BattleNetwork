@@ -25,9 +25,6 @@ namespace BattleNetwork.Battle.UI
             playerUnitCreatedEventListener.playerCreatedCallback += HandlePlayerUnitCreatedEvent;
 
             energyBar.InitializeWithMaxAndInterval(0, battleConfig.maxEnergy);
-
-            // TODO
-            chipDockUI.TestInitializeDock();
         }
 
         private void HandleEnergyChangedEvent(int currentEnergy, float timeTillNextEnergySecs)
@@ -63,6 +60,16 @@ namespace BattleNetwork.Battle.UI
         public int GetChipDataForIndex(int i)
         {
             return chipDockUI.GetChipDataForIndex(i);
+        }
+
+        public void InitializeHand(short[] chipIds)
+        {
+            chipDockUI.InitializeChipDockUI(chipIds.Length);
+            for (int i = 0; i < chipIds.Length; i++)
+            {
+                Debug.LogFormat("Adding chip with id: {0}", chipIds[i]);
+                chipDockUI.AddChip(i, chipIds[i]);
+            }            
         }
     }
 }

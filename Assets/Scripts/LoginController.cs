@@ -5,6 +5,8 @@ using Sfs2X.Util;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.Security.Cryptography;
+using Sfs2X.Entities.Data;
 
 public class LoginController : MonoBehaviour
 {
@@ -27,7 +29,8 @@ public class LoginController : MonoBehaviour
     {
         hostInputField.text = defaultHost;
         portInputField.text = defaultPort;
-        usernameInputField.text = Guid.NewGuid().ToString();
+        usernameInputField.text = "test1";
+        passwordInputField.text = "test";
 
         debugText.text = "";
 
@@ -73,6 +76,7 @@ public class LoginController : MonoBehaviour
         sf.AddEventListener(SFSEvent.CONNECTION_LOST, OnConnectionLost);
         sf.AddEventListener(SFSEvent.LOGIN, OnLogin);
         sf.AddEventListener(SFSEvent.LOGIN_ERROR, OnLoginError);
+        sf.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnExtensionResponse);
 
         sf.AddLogListener(Sfs2X.Logging.LogLevel.INFO, OnInfoMessage);
         sf.AddLogListener(Sfs2X.Logging.LogLevel.WARN, OnWarnMessage);
@@ -86,6 +90,7 @@ public class LoginController : MonoBehaviour
         sf.RemoveEventListener(SFSEvent.CONNECTION_LOST, OnConnectionLost);
         sf.RemoveEventListener(SFSEvent.LOGIN, OnLogin);
         sf.RemoveEventListener(SFSEvent.LOGIN_ERROR, OnLoginError);
+        sf.RemoveEventListener(SFSEvent.EXTENSION_RESPONSE, OnExtensionResponse);
 
         sf.RemoveLogListener(Sfs2X.Logging.LogLevel.INFO, OnInfoMessage);
         sf.RemoveLogListener(Sfs2X.Logging.LogLevel.WARN, OnWarnMessage);
@@ -109,8 +114,11 @@ public class LoginController : MonoBehaviour
             Debug.LogFormat("SFS2X API version {0}", sf.Version);
             Debug.LogFormat("Connection mode {0}", sf.ConnectionMode);
 
+            string hashedPassword = PasswordUtil.MD5Password(passwordInputField.text);
 
-            sf.Send(new Sfs2X.Requests.LoginRequest(usernameInputField.text));
+            Debug.Log(hashedPassword);
+
+            sf.Send(new Sfs2X.Requests.LoginRequest(usernameInputField.text, hashedPassword));
         }
         else
         {
@@ -137,7 +145,19 @@ public class LoginController : MonoBehaviour
         UnregisterSFSListeners();
     }
 
+    private void OnExtensionResponse(BaseEvent evt)
+    {
+        //string cmd = (string)evt.Params["cmd"];
+        //SFSObject dataObject = (SFSObject)evt.Params["params"];
 
+        //switch (cmd)
+        //{
+        //    case "tick":
+        //        break;
+        //    case "pv":
+                
+        //}
+    }
 
 
 

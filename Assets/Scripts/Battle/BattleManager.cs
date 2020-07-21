@@ -80,8 +80,6 @@ namespace BattleNetwork.Battle
 
             CreateArena();
             CreatePlayerUnits();
-            CreateDeck();
-            CreateUI();
 
             StartCoroutine(FakeLoad());
 
@@ -98,19 +96,6 @@ namespace BattleNetwork.Battle
             GameObject arenaGO = GameObject.Instantiate(arenaPrefab);
             arena = arenaGO.GetComponent<Arena>();
             arena.Initialize();
-        }
-
-
-        private void CreateDeck()
-        {
-
-        }
-
-
-        private void CreateUI()
-        {
-            // tODO later create the battle ui dynamically maybe
-
         }
 
         private void CreatePlayerUnits()
@@ -153,22 +138,11 @@ namespace BattleNetwork.Battle
 
             if (state == DraggedUIEvent.State.Ended)
             {
-                Debug.Log("chip played");
-
-
                 // TODO check and possibly play chips
-                ChipUI chipUI = draggable.GetGameObject().GetComponent<ChipUI>();
-                int temp_data = battleUI.GetChipDataForIndex(chipUI.Index);
-
-                // todo check costs
-
-                // cool? lets tell battleUI to cycle chip
-
-                // test cid
-                int cid = 0;
-
+                ChipUI chipUI = draggable.GetGameObject().GetComponent<ChipUI>();               
                 SFSObject obj = new SFSObject();
-                obj.PutInt("cid", cid);
+                obj.PutShort("cid", chipUI.cid);
+                Debug.LogFormat("chip played {0}", chipUI.cid);
                 sfs.Send(new ExtensionRequest("ch", obj, sfs.LastJoinedRoom));
             }
         }
@@ -239,6 +213,16 @@ namespace BattleNetwork.Battle
             {
                 case "tick":
                     CommandsReceived(dataObject);
+                    break;
+                case "hand":
+                    Debug.Log("RECEIVED HAND!");
+                    ISFSArray chips = dataObject.GetSFSArray("chips");
+                    short[] chipsArr = new short[4];
+                    chipsArr[0] = chips.GetShort(0);
+                    chipsArr[1] = chips.GetShort(1);
+                    chipsArr[2] = chips.GetShort(2);
+                    chipsArr[3] = chips.GetShort(3);
+                    battleUI.InitializeHand(chipsArr);
                     break;
                 case "pv":
                     int winner = dataObject.GetInt("pid");
