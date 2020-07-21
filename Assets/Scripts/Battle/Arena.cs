@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using BattleNetwork.Characters;
+using DigitalRubyShared;
 
 namespace BattleNetwork.Battle
 {
@@ -119,6 +120,50 @@ namespace BattleNetwork.Battle
             }
             p.Initialize(position, owner);
         }
+
+
+
+        public bool TryMove(PlayerUnit unit, SwipeGestureRecognizerDirection direction)
+        {
+            string currentTileName = unit.currentTile;
+            string[] currentTileNameArr = currentTileName.Split('_');
+
+            int x = Int32.Parse(currentTileNameArr[0]);
+            int z = Int32.Parse(currentTileNameArr[1]);
+
+            string newTileName = "";
+
+            switch (direction)
+            {
+                case SwipeGestureRecognizerDirection.Up:
+                    newTileName = x + "_" + (z + 1);
+                    break;
+                case SwipeGestureRecognizerDirection.Down:
+                    newTileName = x + "_" + (z - 1);
+                    break;
+                case SwipeGestureRecognizerDirection.Left:
+                    newTileName = (x - 1) + "_" + z;
+                    break;
+                case SwipeGestureRecognizerDirection.Right:
+                    newTileName = (x + 1) + "_" + z;
+                    break;                
+            }
+
+            Tile newTile;
+            if (tiles.TryGetValue(newTileName, out newTile))
+            {
+                if (unit.owner != newTile.owner)
+                {
+                    return false;
+                }
+                unit.currentTile = newTileName;
+                unit.transform.position = newTile.transform.position + new Vector3(0f, 0.5f, 0f);
+                return true;
+            }
+
+            return false;
+        }
+
 
 
         private void LoadArenaData()

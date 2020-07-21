@@ -7,9 +7,13 @@ using Sfs2X.Requests;
 using Sfs2X.Util;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Sfs2X.Entities.Match;
+using Sfs2X.Entities.Data;
 
 public class HomeController : MonoBehaviour
 {
+    [SerializeField] private GameObject matchmakingScreen;
+
     private const string EXTENSION_ID = "BattleNetwork";
     private const string EXTENSION_CLASS = "battleNetwork.BattleNetworkExtension";
 
@@ -56,45 +60,23 @@ public class HomeController : MonoBehaviour
         sfs.AddEventListener(SFSEvent.CONNECTION_LOST, OnConnectionLost);
         sfs.AddEventListener(SFSEvent.ROOM_JOIN, OnRoomJoin);
         sfs.AddEventListener(SFSEvent.ROOM_JOIN_ERROR, OnRoomJoinError);
-        sfs.AddEventListener(SFSEvent.ROOM_ADD, OnRoomAdded);
+        //sfs.AddEventListener(SFSEvent.ROOM_ADD, OnRoomAdded);
     }
     private void UnregisterSFSListeners()
     {
         sfs.RemoveEventListener(SFSEvent.CONNECTION_LOST, OnConnectionLost);
         sfs.RemoveEventListener(SFSEvent.ROOM_JOIN, OnRoomJoin);
         sfs.RemoveEventListener(SFSEvent.ROOM_JOIN_ERROR, OnRoomJoinError);
-        sfs.RemoveEventListener(SFSEvent.ROOM_ADD, OnRoomAdded);
+        //sfs.RemoveEventListener(SFSEvent.ROOM_ADD, OnRoomAdded);
     }
 
     public void PlayButtonClick()
     {
-        TEMP_searching_for_game = true; 
+        TEMP_searching_for_game = true;
 
-        // needs matchmakig later just test this for now
-        bool foundBattleRoom = false;
-        List<Room> rooms = sfs.RoomManager.GetRoomList();
-        foreach (Room room in rooms)
-        {
-            if (room.Name == "battle")
-            {
-                foundBattleRoom = true;
-                sfs.Send(new JoinRoomRequest("battle"));                
-                break;
-            }
-        }
+        matchmakingScreen.SetActive(true);
 
-        if (!foundBattleRoom)
-        {
-            RoomSettings settings = new RoomSettings("battle");
-            settings.GroupId = "games";
-            settings.IsGame = true;
-            settings.MaxUsers = 2;
-            settings.MaxSpectators = 0;
-            settings.Extension = new RoomExtension(EXTENSION_ID, EXTENSION_CLASS);
-
-            // creatiing room doesnt make you join a room
-            sfs.Send(new CreateRoomRequest(settings));
-        }        
+        sfs.Send(new ExtensionRequest("matchmaking", new SFSObject()));       
     }
 
     private void OnConnectionLost(BaseEvent evt)
@@ -130,14 +112,4 @@ public class HomeController : MonoBehaviour
         Debug.LogFormat("Room join failed: " + (string)evt.Params["errorMessage"]);
     }
 
-    private void OnRoomAdded(BaseEvent evt)
-    {
-        Room room = (Room)evt.Params["room"];
-
-        // Update view (only if room is game)
-        if (TEMP_searching_for_game && room.IsGame)
-        {
-            sfs.Send(new JoinRoomRequest("battle"));
-        }
-    }
 }

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace BattleNetwork.Battle.UI
 {
@@ -9,6 +10,8 @@ namespace BattleNetwork.Battle.UI
     public class ChipUI : MonoBehaviour, IDraggableUI
     {
         [SerializeField] private Vector2 dragOffset;
+        [SerializeField] private Image chipArt;
+        public short cid;
 
         public int Index { get; set; }
 
@@ -50,6 +53,12 @@ namespace BattleNetwork.Battle.UI
         public Vector2 Offset()
         {
             return dragOffset;
+        }
+
+        public void Initialize(short cid, Sprite sprite)
+        {
+            this.cid = cid;
+            chipArt.sprite = sprite;
         }
     }
 }

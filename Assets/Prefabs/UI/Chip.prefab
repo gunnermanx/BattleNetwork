@@ -201,6 +201,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dragOffset: {x: -87.5, y: -65}
+  chipArt: {fileID: 5633451568180646923}
+  cid: 0
 --- !u!1 &4524915331813972966
 GameObject:
   m_ObjectHideFlags: 0

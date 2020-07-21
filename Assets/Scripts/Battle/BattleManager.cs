@@ -55,6 +55,10 @@ namespace BattleNetwork.Battle
         private readonly int p1PlayerUnitId = 1;
         private readonly int p2PlayerUnitId = 2;
 
+
+        // TEST
+        private int ticksPerEnergy = 40;
+
         private SmartFox sfs;
 
         public void InitializeBattle()
@@ -76,8 +80,6 @@ namespace BattleNetwork.Battle
 
             CreateArena();
             CreatePlayerUnits();
-            CreateDeck();
-            CreateUI();
 
             StartCoroutine(FakeLoad());
 
@@ -94,19 +96,6 @@ namespace BattleNetwork.Battle
             GameObject arenaGO = GameObject.Instantiate(arenaPrefab);
             arena = arenaGO.GetComponent<Arena>();
             arena.Initialize();
-        }
-
-
-        private void CreateDeck()
-        {
-
-        }
-
-
-        private void CreateUI()
-        {
-            // tODO later create the battle ui dynamically maybe
-
         }
 
         private void CreatePlayerUnits()
@@ -134,7 +123,7 @@ namespace BattleNetwork.Battle
                 // figure out better way later to init energy bar value + movement
                 if (currentTick == 1)
                 {
-                    energyChangedEvent.Raise(energy, 10 * tickTime);
+                    energyChangedEvent.Raise(energy, ticksPerEnergy * tickTime);
                     readyInfoOverlay.SetActive(false);
                 }
             }            
@@ -149,23 +138,18 @@ namespace BattleNetwork.Battle
 
             if (state == DraggedUIEvent.State.Ended)
             {
-                Debug.Log("chip played");
+                // TEMP
+                if (energy >= 2)
+                {
+                    // TODO check and possibly play chips
+                    ChipUI chipUI = draggable.GetGameObject().GetComponent<ChipUI>();
+                    SFSObject obj = new SFSObject();
+                    obj.PutShort("cid", chipUI.cid);
+                    Debug.LogFormat("chip played {0}", chipUI.cid);
+                    sfs.Send(new ExtensionRequest("ch", obj, sfs.LastJoinedRoom));
 
-
-                // TODO check and possibly play chips
-                ChipUI chipUI = draggable.GetGameObject().GetComponent<ChipUI>();
-                int temp_data = battleUI.GetChipDataForIndex(chipUI.Index);
-
-                // todo check costs
-
-                // cool? lets tell battleUI to cycle chip
-
-                // test cid
-                int cid = 0;
-
-                SFSObject obj = new SFSObject();
-                obj.PutInt("cid", cid);
-                sfs.Send(new ExtensionRequest("ch", obj, sfs.LastJoinedRoom));
+                    battleUI.ChipPlayedAtIndex(chipUI.Index);
+                }
             }
         }
 
@@ -183,20 +167,16 @@ namespace BattleNetwork.Battle
             switch (direction)
             {
                 case SwipeGestureRecognizerDirection.Up:
-                    dir = (byte)'u';
-                    //arena.TryMoveUp(localPlayerUnit);
+                    dir = (byte)'u';                    
                     break;
                 case SwipeGestureRecognizerDirection.Down:
-                    dir = (byte)'d';
-                    //arena.TryMoveDown(localPlayerUnit);
+                    dir = (byte)'d';                    
                     break;
                 case SwipeGestureRecognizerDirection.Left:
-                    dir = (byte)'l';
-                    //arena.TryMoveLeft(localPlayerUnit);
+                    dir = (byte)'l';                    
                     break;
                 case SwipeGestureRecognizerDirection.Right:
                     dir = (byte)'r';
-                    //arena.TryMoveRight(localPlayerUnit);
                     break;
                 default:
                     dir = (byte)'0';
@@ -205,6 +185,18 @@ namespace BattleNetwork.Battle
 
             if (dir != (byte)'0')
             {
+                if (currentTick >= 1)
+                {
+                    if (IsPlayer1())
+                    {
+                        arena.TryMove(p1PlayerUnit, direction);
+                    }
+                    else
+                    {
+                        arena.TryMove(p2PlayerUnit, direction);
+                    }
+                }                
+
                 //Debug.LogFormat("Sending swipe {0}", direction);
                 SFSObject obj = new SFSObject();                
                 obj.PutByte("d", dir);
@@ -228,6 +220,15 @@ namespace BattleNetwork.Battle
                 case "tick":
                     CommandsReceived(dataObject);
                     break;
+                case "hand":
+                    ISFSArray chips = dataObject.GetSFSArray("chips");
+                    short[] chipsArr = new short[4];
+                    chipsArr[0] = chips.GetShort(0);
+                    chipsArr[1] = chips.GetShort(1);
+                    chipsArr[2] = chips.GetShort(2);
+                    chipsArr[3] = chips.GetShort(3);
+                    battleUI.InitializeHand(chipsArr);
+                    break;
                 case "pv":
                     int winner = dataObject.GetInt("pid");
                     if (winner == sfs.MySelf.PlayerId)
@@ -246,6 +247,8 @@ namespace BattleNetwork.Battle
             int latestTick = dataObject.GetInt("t");
             serverTick = latestTick;
 
+            //Debug.LogFormat("tick update: {0}", serverTick);
+
             ISFSArray cmds = dataObject.GetSFSArray("c");
 
             if (cmds.Count > 0)
@@ -255,8 +258,6 @@ namespace BattleNetwork.Battle
             {
                 byte cmdId = cmd.GetByte(0);
                 // create a function to multiplex to different parsers
-
-                //Debug.LogFormat("    processing cmd with id == {0}", cmdId);
 
                 // move cmd
                 if (cmdId == (byte) 0)
@@ -285,10 +286,13 @@ namespace BattleNetwork.Battle
                     int playerId = cmd.GetInt(1);
                     int deltaEnergy = cmd.GetInt(2);
 
+                    //Debug.LogFormat("energy changed event received for : %d", playerId);
+
                     if (sfs.MySelf.PlayerId == playerId)
                     {
-                        energy = energy += deltaEnergy;
-                        energyChangedEvent.Raise(energy, 10 * tickTime);
+                        Debug.LogFormat("change in energy, previous {0}, after: {1}", energy, energy + deltaEnergy);
+                        energy = energy + deltaEnergy;
+                        energyChangedEvent.Raise(energy, ticksPerEnergy * tickTime);
                     }                    
                 }
                 // spawn projectile event
@@ -300,7 +304,16 @@ namespace BattleNetwork.Battle
                     int chipId = cmd.GetInt(2);
 
                     arena.PlayChip(playerId, chipId);
-                }                
+                }
+                // chip drawn event
+                else if (cmdId == (byte) 4)
+                {
+                    Debug.Log("chip drawn");
+
+                    short chipId = cmd.GetShort(1);
+
+                    battleUI.AddChipAtLastRemoved(chipId);
+                }
             }
             
         }

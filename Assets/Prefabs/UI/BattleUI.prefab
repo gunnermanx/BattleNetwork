@@ -381,6 +381,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e58f9cc7d4dd7524795704ca4e9939d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  chipVisualsDatabase: {fileID: 11400000, guid: e2ce293bd00145e4fbc0cda3145cb59b,
+    type: 2}
   chipUIPrefab: {fileID: 3361892290431354823, guid: 433ff92c40077e94b95f7982dfa052c1,
     type: 3}
   chipDock: {fileID: 1370284084}
