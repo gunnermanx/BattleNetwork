@@ -14,14 +14,9 @@ public class HomeController : MonoBehaviour
 {
     [SerializeField] private GameObject matchmakingScreen;
 
-    private const string EXTENSION_ID = "BattleNetwork";
-    private const string EXTENSION_CLASS = "battleNetwork.BattleNetworkExtension";
-
     private SmartFox sfs;
     private bool shuttingDown;
 
-
-    private bool TEMP_searching_for_game = false;
 
     private void Awake()
     {
@@ -72,10 +67,7 @@ public class HomeController : MonoBehaviour
 
     public void PlayButtonClick()
     {
-        TEMP_searching_for_game = true;
-
         matchmakingScreen.SetActive(true);
-
         sfs.Send(new ExtensionRequest("matchmaking", new SFSObject()));       
     }
 

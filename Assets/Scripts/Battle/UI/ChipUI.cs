@@ -13,14 +13,28 @@ namespace BattleNetwork.Battle.UI
         [SerializeField] private Image chipArt;
         public short cid;
 
+        private Vector3 initialScale;
+
+        private bool dragging = false;
+
         public int Index { get; set; }
 
         private RectTransform rectTransform;
         private void Start()
         {
             rectTransform = gameObject.GetComponent<RectTransform>();
+            initialScale = rectTransform.localScale;
         }
 
+        private void FixedUpdate()
+        {
+            if (dragging)
+            {
+                float distanceRatio = rectTransform.localPosition.y / 150f;
+                Vector3 scale = Vector3.Lerp(initialScale, new Vector3(0.3f, 0.3f, 0.3f), distanceRatio);
+                rectTransform.localScale = scale;
+            }            
+        }
         
 
         public void TweenToZero(Action tweenComplete, float time)
@@ -32,12 +46,14 @@ namespace BattleNetwork.Battle.UI
 
         public void DragEnded()
         {
-            TweenToZero(null, 0f);
+            dragging = false;
+            rectTransform.localPosition = Vector3.zero;            
+            rectTransform.localScale = initialScale;
         }
 
         public void DragStarted()
         {
-            
+            dragging = true;
         }
 
         public RectTransform GetRectTransform()

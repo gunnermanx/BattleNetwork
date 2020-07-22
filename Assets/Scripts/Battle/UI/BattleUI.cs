@@ -62,14 +62,15 @@ namespace BattleNetwork.Battle.UI
             return chipDockUI.GetChipDataForIndex(i);
         }
 
-        public void InitializeHand(short[] chipIds)
+        public void InitializeHand(short[] chipIds, short nextChip)
         {
             chipDockUI.InitializeChipDockUI(chipIds.Length);
             for (int i = 0; i < chipIds.Length; i++)
             {
                 Debug.LogFormat("Adding chip with id: {0}", chipIds[i]);
                 chipDockUI.AddChip(i, chipIds[i]);
-            }            
+            }
+            chipDockUI.SetNextChipPreview(nextChip);
         }
 
         public void ChipPlayedAtIndex(int i)
@@ -77,9 +78,15 @@ namespace BattleNetwork.Battle.UI
             chipDockUI.RemoveChipAt(i);
         }
 
-        public void AddChipAtLastRemoved(short chipId)
+        public void AddChipAtLastRemoved(short chipId, short nextChipId)
         {
             chipDockUI.AddChipAtLastIndex(chipId);
+            chipDockUI.SetNextChipPreview(nextChipId);
         }
+
+
+
+
+
     }
 }

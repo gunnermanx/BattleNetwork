@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace BattleNetwork.Battle.UI
 {
@@ -9,6 +10,8 @@ namespace BattleNetwork.Battle.UI
         [SerializeField] private ChipVisualData chipVisualsDatabase;
         [SerializeField] private ChipUI chipUIPrefab;
         [SerializeField] private RectTransform chipDock;
+
+        [SerializeField] private Image nextChipImage;
 
         [SerializeField] private float leftPadding;
         [SerializeField] private float rightPadding;
@@ -51,6 +54,7 @@ namespace BattleNetwork.Battle.UI
             InitializeDockWidth(numChips);
             CreateChipAnchors(numChips);
         }
+
 
 
         public int GetChipDataForIndex(int i)
@@ -165,6 +169,11 @@ namespace BattleNetwork.Battle.UI
             dockedChips[index] = chipUI;
         }
 
+        public void SetNextChipPreview(short chipId)
+        {
+            nextChipImage.sprite = chipVisualsDatabase.GetCachedData()[chipId];
+        }
+
         public void AddChipAtLastIndex(short chipId)
         {
             AddChip(lastRemovedIndex, chipId);
@@ -187,6 +196,29 @@ namespace BattleNetwork.Battle.UI
                 dockedChips[i + 1].transform.SetParent(anchors[i]);
                 dockedChips[i + 1].TweenToZero(null, 0.75f);
             }
+        }
+
+
+
+        // ==================================================================================
+        //  Debug
+        // ==================================================================================
+        [ContextMenu("InitChipDock")]
+        public void DebugInitChipDock()
+        {
+            short[] chipIds = new short[4];
+            chipIds[0] = 0;
+            chipIds[1] = 1;
+            chipIds[2] = 2;
+            chipIds[3] = 0;
+
+            InitializeChipDockUI(chipIds.Length);
+            for (int i = 0; i < chipIds.Length; i++)
+            {
+                Debug.LogFormat("Adding chip with id: {0}", chipIds[i]);
+                AddChip(i, chipIds[i]);
+            }
+            SetNextChipPreview(2);
         }
     }
 }

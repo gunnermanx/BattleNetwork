@@ -30,7 +30,6 @@ namespace BattleNetwork.Battle
 
         [SerializeField] private ResultScreen resultScreen;
 
-        [SerializeField] private BattleConfigurationData battleConfig;
 
         // Events
         [SerializeField] private BattleTickEvent battleTickEvent;
@@ -61,6 +60,22 @@ namespace BattleNetwork.Battle
 
         private SmartFox sfs;
 
+        private void Update()
+        {
+            if (currentTick + 1 <= serverTick)
+            {
+                currentTick++;
+                battleTickEvent.Raise(currentTick);
+
+                // figure out better way later to init energy bar value + movement
+                if (currentTick == 1)
+                {
+                    energyChangedEvent.Raise(energy, ticksPerEnergy * tickTime);
+                    readyInfoOverlay.SetActive(false);
+                }
+            }
+        }
+
         public void InitializeBattle()
         {
             draggedUIEventListener = gameObject.GetComponent<DraggedUIEventListener>();
@@ -81,16 +96,9 @@ namespace BattleNetwork.Battle
             CreateArena();
             CreatePlayerUnits();
 
-            StartCoroutine(FakeLoad());
-
-            //sfs.Send(new ExtensionRequest("r", new SFSObject(), sfs.LastJoinedRoom));
-        }
-        private IEnumerator FakeLoad()
-        {
-            yield return new WaitForSeconds(1.0f);
             loadingScreen.SetActive(false);
         }
-
+        
         private void CreateArena()
         {
             GameObject arenaGO = GameObject.Instantiate(arenaPrefab);
@@ -113,22 +121,9 @@ namespace BattleNetwork.Battle
             arena.PlacePlayerUnit(p2PlayerUnit, Constants.Owner.Player2);
         }
 
-        private void Update()
-        {
-            if (currentTick + 1 <= serverTick)
-            {
-                currentTick++;
-                battleTickEvent.Raise(currentTick);
-
-                // figure out better way later to init energy bar value + movement
-                if (currentTick == 1)
-                {
-                    energyChangedEvent.Raise(energy, ticksPerEnergy * tickTime);
-                    readyInfoOverlay.SetActive(false);
-                }
-            }            
-        }
-
+        // ======================================================================================================
+        //  Gesture Handlers
+        // ======================================================================================================
         private void HandleDraggedUIEvent(DraggedUIEvent.State state, IDraggableUI draggable)
         {
             if (state == DraggedUIEvent.State.Started)
@@ -153,27 +148,19 @@ namespace BattleNetwork.Battle
             }
         }
 
-        public void TEMPFinishGame()
-        {
-            // TEMP NEED TO REFACTOR
-            sfs.RemoveAllEventListeners();
-            sfs.Send(new LeaveRoomRequest());
-            SceneManager.LoadScene("Home");
-        }
-
         private void HandleSwipeGestureEvent(SwipeGestureRecognizerDirection direction)
         {
             byte dir;
             switch (direction)
             {
                 case SwipeGestureRecognizerDirection.Up:
-                    dir = (byte)'u';                    
+                    dir = (byte)'u';
                     break;
                 case SwipeGestureRecognizerDirection.Down:
-                    dir = (byte)'d';                    
+                    dir = (byte)'d';
                     break;
                 case SwipeGestureRecognizerDirection.Left:
-                    dir = (byte)'l';                    
+                    dir = (byte)'l';
                     break;
                 case SwipeGestureRecognizerDirection.Right:
                     dir = (byte)'r';
@@ -195,10 +182,10 @@ namespace BattleNetwork.Battle
                     {
                         arena.TryMove(p2PlayerUnit, direction);
                     }
-                }                
+                }
 
                 //Debug.LogFormat("Sending swipe {0}", direction);
-                SFSObject obj = new SFSObject();                
+                SFSObject obj = new SFSObject();
                 obj.PutByte("d", dir);
                 sfs.Send(new ExtensionRequest("m", obj, sfs.LastJoinedRoom));
             }
@@ -209,6 +196,12 @@ namespace BattleNetwork.Battle
             SFSObject obj = new SFSObject();
             sfs.Send(new ExtensionRequest("ba", obj, sfs.LastJoinedRoom));
         }
+
+        
+
+        // ======================================================================================================
+        //  SmartFox Message Handlers
+        // ======================================================================================================    
 
         public void OnExtensionResponse(BaseEvent evt)
         {
@@ -227,7 +220,8 @@ namespace BattleNetwork.Battle
                     chipsArr[1] = chips.GetShort(1);
                     chipsArr[2] = chips.GetShort(2);
                     chipsArr[3] = chips.GetShort(3);
-                    battleUI.InitializeHand(chipsArr);
+                    short nextChip = dataObject.GetShort("next");
+                    battleUI.InitializeHand(chipsArr, nextChip);
                     break;
                 case "pv":
                     int winner = dataObject.GetInt("pid");
@@ -311,12 +305,17 @@ namespace BattleNetwork.Battle
                     Debug.Log("chip drawn");
 
                     short chipId = cmd.GetShort(1);
+                    short nextChipId = cmd.GetShort(2);
 
-                    battleUI.AddChipAtLastRemoved(chipId);
+                    battleUI.AddChipAtLastRemoved(chipId, nextChipId);                    
                 }
             }
             
         }
+
+        // ======================================================================================================
+        //  Helpers
+        // ======================================================================================================
 
         private bool IsPlayer1()
         {
@@ -325,6 +324,14 @@ namespace BattleNetwork.Battle
                 return true;
             }
             return false;
+        }
+
+        public void TEMPFinishGame()
+        {
+            // TEMP NEED TO REFACTOR
+            sfs.RemoveAllEventListeners();
+            sfs.Send(new LeaveRoomRequest());
+            SceneManager.LoadScene("Home");
         }
     }
 }

@@ -377,7 +377,7 @@ PrefabInstance:
     - target: {fileID: 3047034083393310711, guid: 0ed53ca5e08d12142ac45623586d5c2d,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3118452263025538152, guid: 0ed53ca5e08d12142ac45623586d5c2d,
         type: 3}
@@ -457,12 +457,17 @@ PrefabInstance:
     - target: {fileID: 3118452264137934165, guid: 0ed53ca5e08d12142ac45623586d5c2d,
         type: 3}
       propertyPath: debugLogs
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3118452264205264913, guid: 0ed53ca5e08d12142ac45623586d5c2d,
         type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3118452264269610738, guid: 0ed53ca5e08d12142ac45623586d5c2d,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 75
       objectReference: {fileID: 0}
     - target: {fileID: 3118452264269610750, guid: 0ed53ca5e08d12142ac45623586d5c2d,
         type: 3}
@@ -470,6 +475,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: e2ce293bd00145e4fbc0cda3145cb59b,
         type: 2}
+    - target: {fileID: 3613571978170614791, guid: 0ed53ca5e08d12142ac45623586d5c2d,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 5641308867149805426, guid: 0ed53ca5e08d12142ac45623586d5c2d,
         type: 3}
       propertyPath: m_AnchorMax.x

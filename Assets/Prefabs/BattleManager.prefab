@@ -263,7 +263,6 @@ MonoBehaviour:
   readyInfoOverlay: {fileID: 6369425859423620536}
   battleUI: {fileID: 7128703560364990337}
   resultScreen: {fileID: 9209667751339505107}
-  battleConfig: {fileID: 11400000, guid: 8b9c1230bc3e8c542937bb03b6a5110d, type: 2}
   battleTickEvent: {fileID: 11400000, guid: 3da05f6cdd1cc3b44a6ef4ae9517b9cf, type: 2}
   energyChangedEvent: {fileID: 11400000, guid: a33716ac48b691e46b1c37b060d64683, type: 2}
 --- !u!114 &126510578
@@ -324,6 +323,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Text
       value: <RESULT>
+      objectReference: {fileID: 0}
+    - target: {fileID: 5721373936321225272, guid: 6f18bf6adc99ebc4193a73bb309ef10c,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 7282042735150246324, guid: 6f18bf6adc99ebc4193a73bb309ef10c,
         type: 3}
