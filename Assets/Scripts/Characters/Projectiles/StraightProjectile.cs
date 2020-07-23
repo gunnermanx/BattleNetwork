@@ -28,7 +28,7 @@ namespace BattleNetwork.Characters
             
             owner = _owner;
 
-            transform.position = startPos;
+            transform.position = new Vector3(startPos.x, 1.55f, startPos.z);
 
 
             battleTickEventListener = gameObject.GetComponent<BattleTickEventListener>();

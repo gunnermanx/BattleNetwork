@@ -13,10 +13,12 @@ namespace BattleNetwork.Characters
 
         [SerializeField] private PlayerUnitCreatedEvent playerCreatedEvent;
 
-        //test
-        [SerializeField] private GameObject basicBulletPrefab;
+
+        [SerializeField] private SpriteRenderer spriteRenderer;
 
         private Damageable cachedDamageable;
+
+        [SerializeField]  private Animator animator;
 
         private void Start()
         {
@@ -27,6 +29,7 @@ namespace BattleNetwork.Characters
             cachedDamageable.owner = owner;
             cachedDamageable.SetCurrent(100);  // TODO read from config 
 
+
             playerCreatedEvent.Raise(this);
         }
 
@@ -36,6 +39,26 @@ namespace BattleNetwork.Characters
             {                
                 // TODO               
             }
+        }
+
+        public void SetFacingLeft(bool left)
+        {
+            spriteRenderer.flipX = left;            
+        }
+
+        public void TriggerAttackAnimation()
+        {
+            animator.SetTrigger("basic_attack");
+        }
+
+        public void TriggerMeleeAttackAnimation()
+        {
+            animator.SetTrigger("melee_attack");
+        }
+
+        public void TriggerMoveAnimation()
+        {
+            animator.SetTrigger("move");
         }
 
     }

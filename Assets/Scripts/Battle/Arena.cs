@@ -97,7 +97,7 @@ namespace BattleNetwork.Battle
             d.Damage(damage);
         }
 
-        public void PlayChip(int playerId, int chipId)
+        public void ServerSpawnedProjectile(int playerId, int pid)
         {
             // TEMP just create a straight projectile
 
@@ -121,6 +121,45 @@ namespace BattleNetwork.Battle
             p.Initialize(position, owner);
         }
 
+        public void ServerBasicAttack(int playerId)
+        {
+            if (playerId == 1)
+            {
+                p1PlayerUnit.TriggerAttackAnimation();
+            }
+            else if (playerId == 2)
+            {
+                p2PlayerUnit.TriggerAttackAnimation();
+            }
+        }
+
+        public void ServerPlayedChip(int playerId, short chipId)
+        {
+            // Some kind of chip system here, similar to server that will tick chips 
+            // simple test for now
+            PlayerUnit target = null;
+            if (playerId == 1)
+            {
+                target = p1PlayerUnit;
+            }
+            else if (playerId == 2)
+            {
+                target = p2PlayerUnit;
+            }
+
+            if (chipId == 0)
+            {
+                target.TriggerAttackAnimation();
+            }
+            else if (chipId == 1)
+            {
+                target.TriggerAttackAnimation();
+            }
+            else if ( chipId == 2)
+            {
+                target.TriggerMeleeAttackAnimation();
+            }
+        }
 
 
         public bool TryMove(PlayerUnit unit, SwipeGestureRecognizerDirection direction)
@@ -158,6 +197,7 @@ namespace BattleNetwork.Battle
                 }
                 unit.currentTile = newTileName;
                 unit.transform.position = newTile.transform.position + new Vector3(0f, 0.5f, 0f);
+                unit.TriggerMoveAnimation();
                 return true;
             }
 

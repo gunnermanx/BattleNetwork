@@ -113,11 +113,13 @@ namespace BattleNetwork.Battle
             GameObject p1PlayerUnitGO = GameObject.Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
             p1PlayerUnit = p1PlayerUnitGO.GetComponent<PlayerUnit>();
             p1PlayerUnit.id = p1PlayerUnitId;
+            p1PlayerUnit.SetFacingLeft(false);
             arena.PlacePlayerUnit(p1PlayerUnit, Constants.Owner.Player1);
 
             GameObject p2PlayerUnitGO = GameObject.Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
             p2PlayerUnit = p2PlayerUnitGO.GetComponent<PlayerUnit>();
             p2PlayerUnit.id = p2PlayerUnitId;
+            p2PlayerUnit.SetFacingLeft(true);
             arena.PlacePlayerUnit(p2PlayerUnit, Constants.Owner.Player2);
         }
 
@@ -195,6 +197,13 @@ namespace BattleNetwork.Battle
         {
             SFSObject obj = new SFSObject();
             sfs.Send(new ExtensionRequest("ba", obj, sfs.LastJoinedRoom));
+            if (IsPlayer1())
+            {
+                p1PlayerUnit.TriggerAttackAnimation();
+            } else
+            {
+                p2PlayerUnit.TriggerAttackAnimation();
+            }
         }
 
         
@@ -262,6 +271,8 @@ namespace BattleNetwork.Battle
 
                     arena.ServerMoveUnit(unitId, x, y);
 
+                    
+
                     Debug.LogFormat("    received move command from server at tick {0}: move {1} to [{2},{3}]", latestTick, unitId, x, y);
                 }
                 // damage dealt cmd
@@ -297,7 +308,7 @@ namespace BattleNetwork.Battle
                     int playerId = cmd.GetInt(1);
                     int chipId = cmd.GetInt(2);
 
-                    arena.PlayChip(playerId, chipId);
+                    arena.ServerSpawnedProjectile(playerId, chipId);
                 }
                 // chip drawn event
                 else if (cmdId == (byte) 4)
@@ -308,6 +319,25 @@ namespace BattleNetwork.Battle
                     short nextChipId = cmd.GetShort(2);
 
                     battleUI.AddChipAtLastRemoved(chipId, nextChipId);                    
+                }
+                // chip played event
+                else if (cmdId == (byte) 5)
+                {
+                    int playerId = cmd.GetInt(1);
+                    short chipId = cmd.GetShort(2);
+
+                    arena.ServerPlayedChip(playerId, chipId);
+                }
+                // player basic attack
+                else if (cmdId == (byte) 6)
+                {
+                    int playerId = cmd.GetInt(1);
+                    Debug.LogFormat("received basic attack cmd for player {0}", playerId);
+
+                    if (sfs.MySelf.PlayerId != playerId)
+                    {
+                        arena.ServerBasicAttack(playerId);
+                    }
                 }
             }
             
