@@ -223,6 +223,8 @@ namespace BattleNetwork.Battle
                     CommandsReceived(dataObject);
                     break;
                 case "hand":
+                    
+
                     ISFSArray chips = dataObject.GetSFSArray("chips");
                     short[] chipsArr = new short[4];
                     chipsArr[0] = chips.GetShort(0);
@@ -230,6 +232,9 @@ namespace BattleNetwork.Battle
                     chipsArr[2] = chips.GetShort(2);
                     chipsArr[3] = chips.GetShort(3);
                     short nextChip = dataObject.GetShort("next");
+
+                    Debug.LogFormat("Received initial hand! [{0},{1},{2},{3}], next: {4}", chipsArr[0], chipsArr[1], chipsArr[2], chipsArr[3], nextChip);
+
                     battleUI.InitializeHand(chipsArr, nextChip);
                     break;
                 case "pv":
