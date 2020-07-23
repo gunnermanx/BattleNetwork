@@ -94,7 +94,11 @@ namespace BattleNetwork.Battle
             if (sfs != null)
             {
                 sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnExtensionResponse);
-            }            
+            }
+
+            // send a message to the server to let it know we are ready to receive messages
+            SFSObject obj = new SFSObject();            
+            sfs.Send(new ExtensionRequest("pr", obj, sfs.LastJoinedRoom));
 
             CreateArena();
             CreatePlayerUnits();
