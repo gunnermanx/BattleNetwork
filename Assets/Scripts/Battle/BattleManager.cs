@@ -60,6 +60,8 @@ namespace BattleNetwork.Battle
 
         private SmartFox sfs;
 
+        private bool gameStarted;
+
         private void Update()
         {
             if (currentTick + 1 <= serverTick)
@@ -70,6 +72,7 @@ namespace BattleNetwork.Battle
                 // figure out better way later to init energy bar value + movement
                 if (currentTick == 1)
                 {
+                    gameStarted = true;
                     energyChangedEvent.Raise(energy, ticksPerEnergy * tickTime);
                     readyInfoOverlay.SetActive(false);
                 }
@@ -128,6 +131,8 @@ namespace BattleNetwork.Battle
         // ======================================================================================================
         private void HandleDraggedUIEvent(DraggedUIEvent.State state, IDraggableUI draggable)
         {
+            if (!this.gameStarted) return;
+
             if (state == DraggedUIEvent.State.Started)
             {
 
@@ -152,6 +157,8 @@ namespace BattleNetwork.Battle
 
         private void HandleSwipeGestureEvent(SwipeGestureRecognizerDirection direction)
         {
+            if (!this.gameStarted) return;
+
             byte dir;
             switch (direction)
             {
@@ -195,6 +202,8 @@ namespace BattleNetwork.Battle
 
         private void HandleTapGestureEvent(Vector2 screenPos)
         {
+            if (!this.gameStarted) return;
+
             SFSObject obj = new SFSObject();
             sfs.Send(new ExtensionRequest("ba", obj, sfs.LastJoinedRoom));
             if (IsPlayer1())
@@ -238,6 +247,7 @@ namespace BattleNetwork.Battle
                     battleUI.InitializeHand(chipsArr, nextChip);
                     break;
                 case "pv":
+                    gameStarted = false;
                     int winner = dataObject.GetInt("pid");
                     if (winner == sfs.MySelf.PlayerId)
                     {
@@ -274,7 +284,7 @@ namespace BattleNetwork.Battle
                     int x = cmd.GetInt(2);
                     int y = cmd.GetInt(3);
 
-                    arena.ServerMoveUnit(unitId, x, y);
+                    arena.ServerMoveUnit(sfs.MySelf.PlayerId, unitId, x, y);
 
                     
 

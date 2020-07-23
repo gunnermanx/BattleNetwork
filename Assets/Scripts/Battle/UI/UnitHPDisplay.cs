@@ -7,14 +7,14 @@ namespace BattleNetwork.Battle.UI
     public class UnitHPDisplay : MonoBehaviour
     {
 
-        [SerializeField]
-        private Text hpLabel;
+        [SerializeField] private Text hpLabel;
+        private Vector3 offset = Vector2.zero;
 
         private Damageable cachedDamageable = null;
         private Transform cachedDamaegableTransform = null;
-        private Vector2 offset = Vector2.zero;
 
-        public void AttachToIDamageable(Damageable target, Vector2 _offset)
+
+        public void AttachToIDamageable(Damageable target, Vector3 _offset)
         {
             cachedDamageable = target;
             cachedDamaegableTransform = target.gameObject.transform;
@@ -29,8 +29,9 @@ namespace BattleNetwork.Battle.UI
         {
             if (cachedDamageable != null)
             {
-                Vector3 position = Camera.main.WorldToScreenPoint(cachedDamaegableTransform.position);
-                transform.position = position + new Vector3(offset.x, offset.y, 0f);
+                Vector3 worldPos = cachedDamaegableTransform.position + offset;
+                Vector3 position = Camera.main.WorldToScreenPoint(worldPos);
+                transform.position = position;
             }
         }
 
