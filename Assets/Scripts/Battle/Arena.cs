@@ -168,7 +168,7 @@ namespace BattleNetwork.Battle
         }
 
 
-        public bool TryMove(PlayerUnit unit, SwipeGestureRecognizerDirection direction)
+        public bool TryMove(PlayerUnit unit, byte dir)
         {
             string currentTileName = unit.currentTile;
             string[] currentTileNameArr = currentTileName.Split('_');
@@ -178,18 +178,18 @@ namespace BattleNetwork.Battle
 
             string newTileName = "";
 
-            switch (direction)
+            switch (dir)
             {
-                case SwipeGestureRecognizerDirection.Up:
+                case (byte) 'u':
                     newTileName = x + "_" + (z + 1);
                     break;
-                case SwipeGestureRecognizerDirection.Down:
+                case (byte) 'd':
                     newTileName = x + "_" + (z - 1);
                     break;
-                case SwipeGestureRecognizerDirection.Left:
+                case (byte) 'l':
                     newTileName = (x - 1) + "_" + z;
                     break;
-                case SwipeGestureRecognizerDirection.Right:
+                case (byte) 'r':
                     newTileName = (x + 1) + "_" + z;
                     break;                
             }

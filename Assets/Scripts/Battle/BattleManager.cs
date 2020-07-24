@@ -30,6 +30,8 @@ namespace BattleNetwork.Battle
 
         [SerializeField] private ResultScreen resultScreen;
 
+        [SerializeField] private CameraController cameraController;
+
 
         // Events
         [SerializeField] private BattleTickEvent battleTickEvent;
@@ -81,6 +83,21 @@ namespace BattleNetwork.Battle
 
         public void InitializeBattle()
         {
+            sfs = SFSConnector.Instance.Connection;
+            if (sfs != null)
+            {
+                sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnExtensionResponse);
+            } else
+            {
+                //throw Exception("sfs not connected?");
+            }
+
+            cameraController.SetPlayer(sfs.MySelf.PlayerId);
+
+            // send a message to the server to let it know we are ready to receive messages
+            SFSObject obj = new SFSObject();
+            sfs.Send(new ExtensionRequest("pr", obj, sfs.LastJoinedRoom));
+
             draggedUIEventListener = gameObject.GetComponent<DraggedUIEventListener>();
             draggedUIEventListener.draggedUIEventCallback += HandleDraggedUIEvent;
 
@@ -89,16 +106,6 @@ namespace BattleNetwork.Battle
 
             tapGestureEventListener = gameObject.GetComponent<TapGestureEventListener>();
             tapGestureEventListener.tapGestureEventCallback += HandleTapGestureEvent;
-
-            sfs = SFSConnector.Instance.Connection;
-            if (sfs != null)
-            {
-                sfs.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnExtensionResponse);
-            }
-
-            // send a message to the server to let it know we are ready to receive messages
-            SFSObject obj = new SFSObject();            
-            sfs.Send(new ExtensionRequest("pr", obj, sfs.LastJoinedRoom));
 
             CreateArena();
             CreatePlayerUnits();
@@ -163,37 +170,18 @@ namespace BattleNetwork.Battle
         {
             if (!this.gameStarted) return;
 
-            byte dir;
-            switch (direction)
-            {
-                case SwipeGestureRecognizerDirection.Up:
-                    dir = (byte)'u';
-                    break;
-                case SwipeGestureRecognizerDirection.Down:
-                    dir = (byte)'d';
-                    break;
-                case SwipeGestureRecognizerDirection.Left:
-                    dir = (byte)'l';
-                    break;
-                case SwipeGestureRecognizerDirection.Right:
-                    dir = (byte)'r';
-                    break;
-                default:
-                    dir = (byte)'0';
-                    break;
-            }
-
+            byte dir = DirectionToByteDir(direction);
             if (dir != (byte)'0')
             {
                 if (currentTick >= 1)
                 {
                     if (IsPlayer1())
                     {
-                        arena.TryMove(p1PlayerUnit, direction);
+                        arena.TryMove(p1PlayerUnit, dir);
                     }
                     else
                     {
-                        arena.TryMove(p2PlayerUnit, direction);
+                        arena.TryMove(p2PlayerUnit, dir);
                     }
                 }
 
@@ -381,6 +369,31 @@ namespace BattleNetwork.Battle
             sfs.RemoveAllEventListeners();
             sfs.Send(new LeaveRoomRequest());
             SceneManager.LoadScene("Home");
+        }
+
+        private byte DirectionToByteDir(SwipeGestureRecognizerDirection direction)
+        {
+            byte dir;
+            switch (direction)
+            {
+                case SwipeGestureRecognizerDirection.Up:
+                    dir = (sfs.MySelf.PlayerId == 1) ? (byte)'u' : (byte)'d';
+                    break;
+                case SwipeGestureRecognizerDirection.Down:
+                    dir = (sfs.MySelf.PlayerId == 1) ? (byte)'d' : (byte)'u';
+                    break;
+                case SwipeGestureRecognizerDirection.Left:
+                    dir = (sfs.MySelf.PlayerId == 1) ? (byte)'l' : (byte)'r';
+                    break;
+                case SwipeGestureRecognizerDirection.Right:
+                    dir = (sfs.MySelf.PlayerId == 1) ? (byte)'r' : (byte)'l';
+                    break;
+                default:
+                    dir = (byte)'0';
+                    break;
+            }
+
+            return dir;
         }
     }
 }
