@@ -390,7 +390,7 @@ MonoBehaviour:
   leftPadding: 10
   rightPadding: 10
   chipSpacing: 5
-  chipWidth: 175
+  chipWidth: 120
   anchorY: 10
   minimizeY: 100
   minimizeTweenTime: 0.5
