@@ -54,7 +54,7 @@ namespace BattleNetwork.Battle.UI
             Damageable damageable = player.gameObject.GetComponent<Damageable>();
             GameObject hpDisplay = GameObject.Instantiate(hpDisplayPrefab, dyanmicUIParent);
             hpDisplay.GetComponent<UnitHPDisplay>()
-                .AttachToIDamageable(damageable, new Vector3(0f, 0f, -1f));
+                .AttachToIDamageable(damageable, new Vector3(0f, -0.3f, 0f));
         }
 
         public int GetChipDataForIndex(int i)
