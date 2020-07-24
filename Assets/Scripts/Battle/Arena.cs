@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using BattleNetwork.Characters;
 using DigitalRubyShared;
+using Sfs2X;
 
 namespace BattleNetwork.Battle
 {
@@ -72,13 +73,15 @@ namespace BattleNetwork.Battle
 
         // statically determine which path to go instead of recalculating
 
-        public void ServerMoveUnit(int localPlayerId, int unitId, int x, int y)
+        public void ServerMoveUnit(int unitId, int x, int y)
         {
+            SmartFox sfs = SFSConnector.Instance.Connection;
+
             BaseUnit unit;
             bool found = units.TryGetValue(unitId, out unit);
             
             // TODO pretty hacky association, fix later
-            if (unit is PlayerUnit && unit.id != localPlayerId)
+            if (unit is PlayerUnit && unit.id != sfs.MySelf.PlayerId)
             {
                 (unit as PlayerUnit).TriggerMoveAnimation();
             }

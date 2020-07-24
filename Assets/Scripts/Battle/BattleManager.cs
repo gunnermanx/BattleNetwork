@@ -1,15 +1,17 @@
 ﻿using UnityEngine;
 using BattleNetwork.Characters;
 using BattleNetwork.Events;
-using System;
+
 using DigitalRubyShared;
 using BattleNetwork.Battle.UI;
 using Sfs2X;
 using Sfs2X.Entities.Data;
 using Sfs2X.Requests;
 using Sfs2X.Core;
-using System.Collections;
+
 using UnityEngine.SceneManagement;
+using BattleNetwork.Battle.ServerCommandHandlers;
+using System.Collections.Generic;
 
 namespace BattleNetwork.Battle
 {
@@ -26,7 +28,7 @@ namespace BattleNetwork.Battle
         [SerializeField] private GameObject loadingScreen;
         [SerializeField] private GameObject readyInfoOverlay;
 
-        [SerializeField] private BattleUI battleUI;
+        [SerializeField] public BattleUI battleUI;
 
         [SerializeField] private ResultScreen resultScreen;
 
@@ -44,11 +46,9 @@ namespace BattleNetwork.Battle
         private int currentTick = 0;
         private int serverTick = 0;
 
-        private int energy = 0;
+        public int Energy { get; set; }
+        
 
-        private readonly float tickTime = 0.05f;
-
-        private Arena arena;
 
         private PlayerUnit p1PlayerUnit;
         private PlayerUnit p2PlayerUnit;
@@ -58,11 +58,21 @@ namespace BattleNetwork.Battle
 
 
         // TEST
-        private int ticksPerEnergy = 40;
 
+        public static readonly int TICKS_PER_ENERGY = 40;
+        public static readonly float TICK_TIME = 0.05f;
+        
         private SmartFox sfs;
 
         private bool gameStarted;
+
+
+        private Dictionary<byte, BaseCommandHandler> serverHandlerCommands;
+
+
+
+        public Arena Arena { get; set; }
+
 
         private void Update()
         {
@@ -75,7 +85,7 @@ namespace BattleNetwork.Battle
                 if (currentTick == 1)
                 {
                     gameStarted = true;
-                    energyChangedEvent.Raise(energy, ticksPerEnergy * tickTime);
+                    energyChangedEvent.Raise(Energy, TICKS_PER_ENERGY * TICK_TIME);
                     readyInfoOverlay.SetActive(false);
                 }
             }
@@ -94,18 +104,30 @@ namespace BattleNetwork.Battle
 
             cameraController.SetPlayer(sfs.MySelf.PlayerId);
 
+            // Register server cmd handlers
+            serverHandlerCommands = new Dictionary<byte, BaseCommandHandler>();
+            serverHandlerCommands.Add(BaseCommandHandler.MOVE_CMD_ID,               new MoveCommandHandler(this));
+            serverHandlerCommands.Add(BaseCommandHandler.DAMAGE_UNIT_CMD_ID,        new DamageUnitCommandHandler(this));
+            serverHandlerCommands.Add(BaseCommandHandler.ENERGY_CHANGED_CMD_ID,     new EnergyChangedCommandHandler(this, energyChangedEvent));
+            serverHandlerCommands.Add(BaseCommandHandler.SPAWN_PROJECTILE_CMD_ID,   new SpawnProjectileCommandHandler(this));
+            serverHandlerCommands.Add(BaseCommandHandler.CHIP_DRAWN_CMD_ID,         new ChipDrawnCommandHandler(this));
+            serverHandlerCommands.Add(BaseCommandHandler.CHIP_PLAYED_CMD_ID,        new ChipPlayedCommandHandler(this));
+            serverHandlerCommands.Add(BaseCommandHandler.BASIC_ATTACK_CMD_ID,       new BasicAttackCommandHandler(this));
+
+
+            // Gesture event handlers
+            draggedUIEventListener = gameObject.GetComponent<DraggedUIEventListener>();
+            draggedUIEventListener.draggedUIEventCallback += HandleDraggedUIEvent;
+            swipeGestureEventListener = gameObject.GetComponent<SwipeGestureEventListener>();
+            swipeGestureEventListener.swipeGestureEventCallback += HandleSwipeGestureEvent;
+            tapGestureEventListener = gameObject.GetComponent<TapGestureEventListener>();
+            tapGestureEventListener.tapGestureEventCallback += HandleTapGestureEvent;
+
+
             // send a message to the server to let it know we are ready to receive messages
             SFSObject obj = new SFSObject();
             sfs.Send(new ExtensionRequest("pr", obj, sfs.LastJoinedRoom));
 
-            draggedUIEventListener = gameObject.GetComponent<DraggedUIEventListener>();
-            draggedUIEventListener.draggedUIEventCallback += HandleDraggedUIEvent;
-
-            swipeGestureEventListener = gameObject.GetComponent<SwipeGestureEventListener>();
-            swipeGestureEventListener.swipeGestureEventCallback += HandleSwipeGestureEvent;
-
-            tapGestureEventListener = gameObject.GetComponent<TapGestureEventListener>();
-            tapGestureEventListener.tapGestureEventCallback += HandleTapGestureEvent;
 
             CreateArena();
             CreatePlayerUnits();
@@ -116,8 +138,8 @@ namespace BattleNetwork.Battle
         private void CreateArena()
         {
             GameObject arenaGO = GameObject.Instantiate(arenaPrefab);
-            arena = arenaGO.GetComponent<Arena>();
-            arena.Initialize();
+            Arena = arenaGO.GetComponent<Arena>();
+            Arena.Initialize();
         }
 
         private void CreatePlayerUnits()
@@ -128,13 +150,13 @@ namespace BattleNetwork.Battle
             p1PlayerUnit = p1PlayerUnitGO.GetComponent<PlayerUnit>();
             p1PlayerUnit.id = p1PlayerUnitId;
             p1PlayerUnit.SetFacingLeft(false);
-            arena.PlacePlayerUnit(p1PlayerUnit, Constants.Owner.Player1);
+            Arena.PlacePlayerUnit(p1PlayerUnit, Constants.Owner.Player1);
 
             GameObject p2PlayerUnitGO = GameObject.Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
             p2PlayerUnit = p2PlayerUnitGO.GetComponent<PlayerUnit>();
             p2PlayerUnit.id = p2PlayerUnitId;
             p2PlayerUnit.SetFacingLeft(true);
-            arena.PlacePlayerUnit(p2PlayerUnit, Constants.Owner.Player2);
+            Arena.PlacePlayerUnit(p2PlayerUnit, Constants.Owner.Player2);
         }
 
         // ======================================================================================================
@@ -144,15 +166,10 @@ namespace BattleNetwork.Battle
         {
             if (!this.gameStarted) return;
 
-            if (state == DraggedUIEvent.State.Started)
-            {
-
-            }
-
             if (state == DraggedUIEvent.State.Ended)
             {
                 // TEMP
-                if (energy >= 2)
+                if (Energy >= 2)
                 {
                     // TODO check and possibly play chips
                     ChipUI chipUI = draggable.GetGameObject().GetComponent<ChipUI>();
@@ -166,6 +183,7 @@ namespace BattleNetwork.Battle
             }
         }
 
+
         private void HandleSwipeGestureEvent(SwipeGestureRecognizerDirection direction)
         {
             if (!this.gameStarted) return;
@@ -177,20 +195,20 @@ namespace BattleNetwork.Battle
                 {
                     if (IsPlayer1())
                     {
-                        arena.TryMove(p1PlayerUnit, dir);
+                        Arena.TryMove(p1PlayerUnit, dir);
                     }
                     else
                     {
-                        arena.TryMove(p2PlayerUnit, dir);
+                        Arena.TryMove(p2PlayerUnit, dir);
                     }
                 }
 
-                //Debug.LogFormat("Sending swipe {0}", direction);
                 SFSObject obj = new SFSObject();
                 obj.PutByte("d", dir);
                 sfs.Send(new ExtensionRequest("m", obj, sfs.LastJoinedRoom));
             }
         }
+
 
         private void HandleTapGestureEvent(Vector2 screenPos)
         {
@@ -231,9 +249,7 @@ namespace BattleNetwork.Battle
                 case "tick":
                     CommandsReceived(dataObject);
                     break;
-                case "hand":
-                    
-
+                case "hand":                    
                     ISFSArray chips = dataObject.GetSFSArray("chips");
                     short[] chipsArr = new short[4];
                     chipsArr[0] = chips.GetShort(0);
@@ -265,103 +281,21 @@ namespace BattleNetwork.Battle
             int latestTick = dataObject.GetInt("t");
             serverTick = latestTick;
 
-            //Debug.LogFormat("tick update: {0}", serverTick);
-
             ISFSArray cmds = dataObject.GetSFSArray("c");
-
-            //if (cmds.Count > 0)
-            //  Debug.LogFormat("At tick {0}, received {1} cmds", latestTick, cmds.Count);
-
             foreach (ISFSArray cmd in cmds)
             {
+                // The first byte in array is the command identitifer
                 byte cmdId = cmd.GetByte(0);
-                // create a function to multiplex to different parsers
-
-                // move cmd
-                if (cmdId == (byte) 0)
+                if ( serverHandlerCommands.TryGetValue(cmdId, out BaseCommandHandler cmdHandler) )
                 {
-                    int unitId = cmd.GetInt(1);
-                    int x = cmd.GetInt(2);
-                    int y = cmd.GetInt(3);
-
-                    arena.ServerMoveUnit(sfs.MySelf.PlayerId, unitId, x, y);
-
-                    
-
-                    Debug.LogFormat("    received move command from server at tick {0}: move {1} to [{2},{3}]", latestTick, unitId, x, y);
-                }
-                // damage dealt cmd
-                else if (cmdId == (byte) 1)
+                    cmdHandler.Execute(cmd);
+                } else
                 {
-                    int unitId = cmd.GetInt(1);
-                    int damage = cmd.GetInt(2);
-
-                    Debug.LogFormat("unit {0} was damaged for {1}", unitId, damage);
-
-                    arena.ServerDamageUnit(unitId, damage);
+                    Debug.LogFormat("Received unknown command {0} from server", cmdId);
                 }
-                // energy changed event
-                else if (cmdId == (byte) 2)
-                {
-                    int playerId = cmd.GetInt(1);
-                    int deltaEnergy = cmd.GetInt(2);
-
-                    //Debug.LogFormat("energy changed event received for : %d", playerId);
-
-                    if (sfs.MySelf.PlayerId == playerId)
-                    {
-                        Debug.LogFormat("change in energy, previous {0}, after: {1}", energy, energy + deltaEnergy);
-                        energy = energy + deltaEnergy;
-                        energyChangedEvent.Raise(energy, ticksPerEnergy * tickTime);
-                    }                    
-                }
-                // spawn projectile event
-                else if (cmdId == (byte) 3)
-                {
-                    Debug.Log("received command to spawn projectile");
-
-                    int playerId = cmd.GetInt(1);
-                    int chipId = cmd.GetInt(2);
-
-                    arena.ServerSpawnedProjectile(playerId, chipId);
-                }
-                // chip drawn event
-                else if (cmdId == (byte) 4)
-                {
-                    Debug.Log("chip drawn");
-
-                    int playerId = cmd.GetInt(1);
-                    short chipId = cmd.GetShort(2);
-                    short nextChipId = cmd.GetShort(3);
-
-                    if (playerId == sfs.MySelf.PlayerId)
-                    {
-                        battleUI.AddChipAtLastRemoved(chipId, nextChipId);
-                    }
-                    
-                }
-                // chip played event
-                else if (cmdId == (byte) 5)
-                {
-                    int playerId = cmd.GetInt(1);
-                    short chipId = cmd.GetShort(2);
-
-                    arena.ServerPlayedChip(playerId, chipId);
-                }
-                // player basic attack
-                else if (cmdId == (byte) 6)
-                {
-                    int playerId = cmd.GetInt(1);
-                    Debug.LogFormat("received basic attack cmd for player {0}", playerId);
-
-                    if (sfs.MySelf.PlayerId != playerId)
-                    {
-                        arena.ServerBasicAttack(playerId);
-                    }
-                }
-            }
-            
+            }            
         }
+
 
         // ======================================================================================================
         //  Helpers
