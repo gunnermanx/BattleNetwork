@@ -100,6 +100,12 @@ namespace BattleNetwork.Battle
 
             Damageable d = unit.GetComponent<Damageable>();
 
+            // TODO pretty hacky association, fix later
+            if (unit is PlayerUnit)
+            {
+                (unit as PlayerUnit).TriggerHitAnimation();
+            }
+
             d.Damage(damage);
         }
 

@@ -20,6 +20,8 @@ namespace BattleNetwork.Characters
 
         [SerializeField]  private Animator animator;
 
+        private int lastBasicAttackTick = 0;
+
         private void Start()
         {
             //cachedPhotonView = gameObject.GetComponent<PhotonView>();
@@ -41,6 +43,16 @@ namespace BattleNetwork.Characters
             }
         }
 
+        public bool TryBasicAttack(int currentTick)
+        {
+            // TODO configurable tick attack delay
+            if (currentTick >= lastBasicAttackTick + 3) {
+                lastBasicAttackTick = currentTick;
+                return true;
+            }
+            return false;
+        }
+
         public void SetFacingLeft(bool left)
         {
             spriteRenderer.flipX = left;            
@@ -59,6 +71,11 @@ namespace BattleNetwork.Characters
         public void TriggerMoveAnimation()
         {
             animator.SetTrigger("move");
+        }
+
+        public void TriggerHitAnimation()
+        {
+            animator.SetTrigger("hit");
         }
 
     }

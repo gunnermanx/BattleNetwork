@@ -196,14 +196,22 @@ namespace BattleNetwork.Battle
         {
             if (!this.gameStarted) return;
 
-            SFSObject obj = new SFSObject();
-            sfs.Send(new ExtensionRequest("ba", obj, sfs.LastJoinedRoom));
             if (IsPlayer1())
             {
-                p1PlayerUnit.TriggerAttackAnimation();
-            } else
+                if (p1PlayerUnit.TryBasicAttack(currentTick)) {
+                    SFSObject obj = new SFSObject();
+                    sfs.Send(new ExtensionRequest("ba", obj, sfs.LastJoinedRoom));
+                    p1PlayerUnit.TriggerAttackAnimation();
+                }                
+            }
+            else
             {
-                p2PlayerUnit.TriggerAttackAnimation();
+                if (p2PlayerUnit.TryBasicAttack(currentTick))
+                {
+                    SFSObject obj = new SFSObject();
+                    sfs.Send(new ExtensionRequest("ba", obj, sfs.LastJoinedRoom));
+                    p2PlayerUnit.TriggerAttackAnimation();
+                }                
             }
         }
 
@@ -261,8 +269,8 @@ namespace BattleNetwork.Battle
 
             ISFSArray cmds = dataObject.GetSFSArray("c");
 
-            if (cmds.Count > 0)
-                Debug.LogFormat("At tick {0}, received {1} cmds", latestTick, cmds.Count);
+            //if (cmds.Count > 0)
+            //  Debug.LogFormat("At tick {0}, received {1} cmds", latestTick, cmds.Count);
 
             foreach (ISFSArray cmd in cmds)
             {
@@ -322,10 +330,15 @@ namespace BattleNetwork.Battle
                 {
                     Debug.Log("chip drawn");
 
-                    short chipId = cmd.GetShort(1);
-                    short nextChipId = cmd.GetShort(2);
+                    int playerId = cmd.GetInt(1);
+                    short chipId = cmd.GetShort(2);
+                    short nextChipId = cmd.GetShort(3);
 
-                    battleUI.AddChipAtLastRemoved(chipId, nextChipId);                    
+                    if (playerId == sfs.MySelf.PlayerId)
+                    {
+                        battleUI.AddChipAtLastRemoved(chipId, nextChipId);
+                    }
+                    
                 }
                 // chip played event
                 else if (cmdId == (byte) 5)

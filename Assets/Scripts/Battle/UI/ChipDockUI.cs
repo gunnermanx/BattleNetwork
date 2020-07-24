@@ -34,7 +34,7 @@ namespace BattleNetwork.Battle.UI
         private ChipUI[] dockedChips;
         private RectTransform[] anchors;
 
-        private int lastRemovedIndex;
+        private int lastRemovedIndex = -1;
 
 
         private void Start()
@@ -176,7 +176,14 @@ namespace BattleNetwork.Battle.UI
 
         public void AddChipAtLastIndex(short chipId)
         {
-            AddChip(lastRemovedIndex, chipId);
+            if (lastRemovedIndex != -1)
+            {
+                AddChip(lastRemovedIndex, chipId);
+                lastRemovedIndex = -1;
+            } else
+            {
+                Debug.LogError("ERROR: Tried to add to last removed index, but there was no last removed chip");
+            }            
         }
 
         public void RemoveChipAt(int index)
