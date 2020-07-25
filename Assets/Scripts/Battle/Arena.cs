@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using BattleNetwork.Characters;
 using DigitalRubyShared;
 using Sfs2X;
+using BattleNetwork.Battle.Chips;
 
 namespace BattleNetwork.Battle
 {
@@ -25,8 +26,12 @@ namespace BattleNetwork.Battle
         private PlayerUnit p1PlayerUnit;
         private PlayerUnit p2PlayerUnit;
 
+        private BaseChip p1ActiveChip;
+        private BaseChip p2ActiveChip;
+
         public void Initialize()
         {
+
             // will need to be changed, load data based on name, and what server told us
             LoadArenaData();
 
@@ -112,30 +117,6 @@ namespace BattleNetwork.Battle
             d.Damage(damage);
         }
 
-        public void ServerSpawnedProjectile(int playerId, int pid)
-        {
-            // TEMP just create a straight projectile
-
-            GameObject projectile = Instantiate(
-                Resources.Load("TestStraightProjectile", typeof(GameObject))
-            ) as GameObject;
-            StraightProjectile p = projectile.GetComponent<StraightProjectile>();
-
-            Vector3 position = Vector3.zero;
-            Constants.Owner owner = Constants.Owner.None;
-            if (playerId == 1)
-            {
-                position = p1PlayerUnit.transform.position;
-                owner = Constants.Owner.Player1;
-            }
-            else if (playerId == 2)
-            {
-                position = p2PlayerUnit.transform.position;
-                owner = Constants.Owner.Player2;
-            }
-            p.Initialize(position, owner);
-        }
-
         public void ServerBasicAttack(int playerId)
         {
             if (playerId == 1)
@@ -156,23 +137,14 @@ namespace BattleNetwork.Battle
             if (playerId == 1)
             {
                 target = p1PlayerUnit;
+                p1ActiveChip = ChipFactory.GetChip(target, playerId, chipId);
+                p1ActiveChip.Init();
             }
             else if (playerId == 2)
             {
                 target = p2PlayerUnit;
-            }
-
-            if (chipId == 0)
-            {
-                target.TriggerAttackAnimation();
-            }
-            else if (chipId == 1)
-            {
-                target.TriggerAttackAnimation();
-            }
-            else if ( chipId == 2)
-            {
-                target.TriggerMeleeAttackAnimation();
+                p2ActiveChip = ChipFactory.GetChip(target, playerId, chipId);
+                p2ActiveChip.Init();
             }
         }
 

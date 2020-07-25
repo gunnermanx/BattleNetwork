@@ -95,7 +95,6 @@ namespace BattleNetwork.Battle
             serverHandlerCommands.Add(BaseCommandHandler.MOVE_CMD_ID,               new MoveCommandHandler(this));
             serverHandlerCommands.Add(BaseCommandHandler.DAMAGE_UNIT_CMD_ID,        new DamageUnitCommandHandler(this));
             serverHandlerCommands.Add(BaseCommandHandler.ENERGY_CHANGED_CMD_ID,     new EnergyChangedCommandHandler(this, energyChangedEvent));
-            serverHandlerCommands.Add(BaseCommandHandler.SPAWN_PROJECTILE_CMD_ID,   new SpawnProjectileCommandHandler(this));
             serverHandlerCommands.Add(BaseCommandHandler.CHIP_DRAWN_CMD_ID,         new ChipDrawnCommandHandler(this));
             serverHandlerCommands.Add(BaseCommandHandler.CHIP_PLAYED_CMD_ID,        new ChipPlayedCommandHandler(this));
             serverHandlerCommands.Add(BaseCommandHandler.BASIC_ATTACK_CMD_ID,       new BasicAttackCommandHandler(this));
