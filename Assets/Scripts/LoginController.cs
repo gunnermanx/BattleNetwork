@@ -50,15 +50,12 @@ public class LoginController : MonoBehaviour
 
         if (request.isNetworkError || request.isHttpError)
         {
-            // TODO  handle the error
             Debug.Log(request.error);
         }
         else
         {
             string jsonString = request.downloadHandler.text;
-
             GameDB.Instance.ChipsDB = JsonConvert.DeserializeObject<ChipsDB>(jsonString);
- 
         }
 
 
@@ -104,7 +101,6 @@ public class LoginController : MonoBehaviour
         sf.AddEventListener(SFSEvent.CONNECTION_LOST, OnConnectionLost);
         sf.AddEventListener(SFSEvent.LOGIN, OnLogin);
         sf.AddEventListener(SFSEvent.LOGIN_ERROR, OnLoginError);
-        sf.AddEventListener(SFSEvent.EXTENSION_RESPONSE, OnExtensionResponse);
 
         sf.AddLogListener(Sfs2X.Logging.LogLevel.INFO, OnInfoMessage);
         sf.AddLogListener(Sfs2X.Logging.LogLevel.WARN, OnWarnMessage);
@@ -118,7 +114,6 @@ public class LoginController : MonoBehaviour
         sf.RemoveEventListener(SFSEvent.CONNECTION_LOST, OnConnectionLost);
         sf.RemoveEventListener(SFSEvent.LOGIN, OnLogin);
         sf.RemoveEventListener(SFSEvent.LOGIN_ERROR, OnLoginError);
-        sf.RemoveEventListener(SFSEvent.EXTENSION_RESPONSE, OnExtensionResponse);
 
         sf.RemoveLogListener(Sfs2X.Logging.LogLevel.INFO, OnInfoMessage);
         sf.RemoveLogListener(Sfs2X.Logging.LogLevel.WARN, OnWarnMessage);
@@ -157,7 +152,6 @@ public class LoginController : MonoBehaviour
     private void OnConnectionLost(BaseEvent evt)
     {
         Debug.LogFormat("Connection Lost: {0}", (string)evt.Params["reason"]);
-        // remove sfs2x listeners
         UnregisterSFSListeners();
     }
 
@@ -173,19 +167,6 @@ public class LoginController : MonoBehaviour
         UnregisterSFSListeners();
     }
 
-    private void OnExtensionResponse(BaseEvent evt)
-    {
-        //string cmd = (string)evt.Params["cmd"];
-        //SFSObject dataObject = (SFSObject)evt.Params["params"];
-
-        //switch (cmd)
-        //{
-        //    case "tick":
-        //        break;
-        //    case "pv":
-                
-        //}
-    }
 
 
 
