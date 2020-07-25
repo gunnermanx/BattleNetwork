@@ -12,8 +12,6 @@ namespace BattleNetwork.Battle.UI
         [SerializeField] private EnergyBar energyBar;
         [SerializeField] private Transform dyanmicUIParent;
 
-        [SerializeField] private BattleConfigurationData battleConfig;
-
         [SerializeField] private PlayerUnitCreatedEventListener playerUnitCreatedEventListener;
         [SerializeField] private EnergyChangedEventListener energyChangedEventListener;
         [SerializeField] private DraggedUIEventListener draggedUIEventListener;
@@ -24,7 +22,7 @@ namespace BattleNetwork.Battle.UI
             draggedUIEventListener.draggedUIEventCallback += HandleDraggedUIEvent;
             playerUnitCreatedEventListener.playerCreatedCallback += HandlePlayerUnitCreatedEvent;
 
-            energyBar.InitializeWithMaxAndInterval(0, battleConfig.maxEnergy);
+            energyBar.InitializeWithMaxAndInterval(0, 6);
         }
 
         private void HandleEnergyChangedEvent(int currentEnergy, float timeTillNextEnergySecs)
