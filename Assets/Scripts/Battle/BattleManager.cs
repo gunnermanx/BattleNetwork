@@ -19,60 +19,46 @@ namespace BattleNetwork.Battle
     [RequireComponent(typeof(DraggedUIEventListener))]
     public class BattleManager : MonoBehaviour
     {
+        private static readonly int P1_PLAYER_UNIT_ID = 1;
+        private static readonly int P2_PLAYER_UNIT_ID = 2;
+
+        public static readonly int TICKS_PER_ENERGY = 40;
+        public static readonly float TICK_TIME = 0.05f;
+
         // temporary, we want to load it dynamically later
         [SerializeField] private GameObject arenaPrefab;
         // temporary, we want to load it dynamically later
         [SerializeField] private GameObject playerPrefab;
 
-
+        // Connections to other prefab elements
         [SerializeField] private GameObject loadingScreen;
         [SerializeField] private GameObject readyInfoOverlay;
-
         [SerializeField] public BattleUI battleUI;
-
         [SerializeField] private ResultScreen resultScreen;
-
         [SerializeField] private CameraController cameraController;
-
 
         // Events
         [SerializeField] private BattleTickEvent battleTickEvent;
         [SerializeField] private EnergyChangedEvent energyChangedEvent;
-
         private DraggedUIEventListener draggedUIEventListener;
         private SwipeGestureEventListener swipeGestureEventListener;
         private TapGestureEventListener tapGestureEventListener;
 
+        // Public Properties
+        public int Energy { get; set; }
+        public Arena Arena { get; set; }
+
+        // Private vars
         private int currentTick = 0;
         private int serverTick = 0;
 
-        public int Energy { get; set; }
-        
-
-
         private PlayerUnit p1PlayerUnit;
         private PlayerUnit p2PlayerUnit;
-
-        private readonly int p1PlayerUnitId = 1;
-        private readonly int p2PlayerUnitId = 2;
-
-
-        // TEST
-
-        public static readonly int TICKS_PER_ENERGY = 40;
-        public static readonly float TICK_TIME = 0.05f;
-        
         private SmartFox sfs;
 
         private bool gameStarted;
 
-
         private Dictionary<byte, BaseCommandHandler> serverHandlerCommands;
-
-
-
-        public Arena Arena { get; set; }
-
 
         private void Update()
         {
@@ -148,13 +134,13 @@ namespace BattleNetwork.Battle
             // do something here            
             GameObject p1PlayerUnitGO = GameObject.Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
             p1PlayerUnit = p1PlayerUnitGO.GetComponent<PlayerUnit>();
-            p1PlayerUnit.id = p1PlayerUnitId;
+            p1PlayerUnit.id = P1_PLAYER_UNIT_ID;
             p1PlayerUnit.SetFacingLeft(false);
             Arena.PlacePlayerUnit(p1PlayerUnit, Constants.Owner.Player1);
 
             GameObject p2PlayerUnitGO = GameObject.Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
             p2PlayerUnit = p2PlayerUnitGO.GetComponent<PlayerUnit>();
-            p2PlayerUnit.id = p2PlayerUnitId;
+            p2PlayerUnit.id = P2_PLAYER_UNIT_ID;
             p2PlayerUnit.SetFacingLeft(true);
             Arena.PlacePlayerUnit(p2PlayerUnit, Constants.Owner.Player2);
         }
