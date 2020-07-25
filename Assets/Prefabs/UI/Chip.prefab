@@ -202,6 +202,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dragOffset: {x: -87.5, y: -65}
   chipArt: {fileID: 5633451568180646923}
+  costText: {fileID: 8906702411446783413}
   cid: 0
 --- !u!1 &4524915331813972966
 GameObject:

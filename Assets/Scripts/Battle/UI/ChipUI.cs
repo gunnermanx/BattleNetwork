@@ -11,6 +11,7 @@ namespace BattleNetwork.Battle.UI
     {
         [SerializeField] private Vector2 dragOffset;
         [SerializeField] private Image chipArt;
+        [SerializeField] private Text costText;
         public short cid;
 
         private Vector3 initialScale;
@@ -71,10 +72,11 @@ namespace BattleNetwork.Battle.UI
             return dragOffset;
         }
 
-        public void Initialize(short cid, Sprite sprite)
+        public void Initialize(short cid, Sprite sprite, int cost)
         {
             this.cid = cid;
             chipArt.sprite = sprite;
+            costText.text = cost.ToString();
         }
     }
 }

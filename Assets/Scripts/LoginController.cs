@@ -5,8 +5,10 @@ using Sfs2X.Util;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using System.Security.Cryptography;
-using Sfs2X.Entities.Data;
+using UnityEngine.Networking;
+using System.Collections;
+using BattleNetwork.Data;
+using Newtonsoft.Json;
 
 public class LoginController : MonoBehaviour
 {
@@ -25,6 +27,8 @@ public class LoginController : MonoBehaviour
     private string defaultHost = "172.16.10.180";
     private string defaultPort = "9933";
 
+    private static readonly string PLACEHOLDER_GAMEDATA_JSON_URL = "https://s3-us-west-1.amazonaws.com/battlenetwork.gamedata/chips.json";
+
     private void Start()
     {
         hostInputField.text = defaultHost;
@@ -33,6 +37,30 @@ public class LoginController : MonoBehaviour
         passwordInputField.text = "test";
 
         debugText.text = "";
+
+        StartCoroutine(LoadGameData());
+    }
+
+    private IEnumerator LoadGameData()
+    {
+        // Later need to compare manifests and such, for now just keep it simple
+        UnityWebRequest request = new UnityWebRequest(PLACEHOLDER_GAMEDATA_JSON_URL);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        yield return request.SendWebRequest();
+
+        if (request.isNetworkError || request.isHttpError)
+        {
+            // TODO  handle the error
+            Debug.Log(request.error);
+        }
+        else
+        {
+            string jsonString = request.downloadHandler.text;
+
+            GameDB.Instance.ChipsDB = JsonConvert.DeserializeObject<ChipsDB>(jsonString);
+ 
+        }
+
 
         enableInterface(true);
     }

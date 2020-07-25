@@ -12,6 +12,7 @@ using Sfs2X.Core;
 using UnityEngine.SceneManagement;
 using BattleNetwork.Battle.ServerCommandHandlers;
 using System.Collections.Generic;
+using BattleNetwork.Data;
 
 namespace BattleNetwork.Battle
 {
@@ -117,7 +118,7 @@ namespace BattleNetwork.Battle
             CreateArena();
             CreatePlayerUnits();
 
-            loadingScreen.SetActive(false);
+            //loadingScreen.SetActive(false);
         }
         
         private void CreateArena()
@@ -152,12 +153,12 @@ namespace BattleNetwork.Battle
             if (!this.gameStarted) return;
 
             if (state == DraggedUIEvent.State.Ended)
-            {
-                // TEMP
-                if (Energy >= 2)
+            {   
+                ChipUI chipUI = draggable.GetGameObject().GetComponent<ChipUI>();
+
+                Chip c = GameDB.Instance.ChipsDB.GetChip(chipUI.cid);
+                if (Energy >= c.cost)
                 {
-                    // TODO check and possibly play chips
-                    ChipUI chipUI = draggable.GetGameObject().GetComponent<ChipUI>();
                     SFSObject obj = new SFSObject();
                     obj.PutShort("cid", chipUI.cid);
                     Debug.LogFormat("chip played {0}", chipUI.cid);
@@ -234,31 +235,33 @@ namespace BattleNetwork.Battle
                 case "tick":
                     CommandsReceived(dataObject);
                     break;
-                case "hand":                    
-                    ISFSArray chips = dataObject.GetSFSArray("chips");
-                    short[] chipsArr = new short[4];
-                    chipsArr[0] = chips.GetShort(0);
-                    chipsArr[1] = chips.GetShort(1);
-                    chipsArr[2] = chips.GetShort(2);
-                    chipsArr[3] = chips.GetShort(3);
-                    short nextChip = dataObject.GetShort("next");
-
-                    Debug.LogFormat("Received initial hand! [{0},{1},{2},{3}], next: {4}", chipsArr[0], chipsArr[1], chipsArr[2], chipsArr[3], nextChip);
-
-                    battleUI.InitializeHand(chipsArr, nextChip);
+                case "hand":
+                    InitializeHand(dataObject);
                     break;
                 case "pv":
-                    gameStarted = false;
-                    int winner = dataObject.GetInt("pid");
-                    if (winner == sfs.MySelf.PlayerId)
-                    {
-                        resultScreen.SetWon();
-                    } else
-                    {
-                        resultScreen.SetLost();
-                    }                    
+                    GameEnded(dataObject);
                     break;
             }
+        }
+
+        private void InitializeHand(SFSObject dataObject)
+        {
+            // Maybe this shouldnt be initialize hand but in general receive intialization data from the server
+            ISFSArray chips = dataObject.GetSFSArray("chips");
+            short[] chipsArr = new short[4];
+            chipsArr[0] = chips.GetShort(0);
+            chipsArr[1] = chips.GetShort(1);
+            chipsArr[2] = chips.GetShort(2);
+            chipsArr[3] = chips.GetShort(3);
+            short nextChip = dataObject.GetShort("next");
+
+            Debug.LogFormat("Received initial hand! [{0},{1},{2},{3}], next: {4}", chipsArr[0], chipsArr[1], chipsArr[2], chipsArr[3], nextChip);
+
+            battleUI.InitializeHand(chipsArr, nextChip);
+
+            
+            // Maybe
+            loadingScreen.SetActive(false);
         }
 
         private void CommandsReceived(SFSObject dataObject)
@@ -279,6 +282,20 @@ namespace BattleNetwork.Battle
                     Debug.LogFormat("Received unknown command {0} from server", cmdId);
                 }
             }            
+        }
+
+        private void GameEnded(SFSObject dataObject)
+        {
+            gameStarted = false;
+            int winner = dataObject.GetInt("pid");
+            if (winner == sfs.MySelf.PlayerId)
+            {
+                resultScreen.SetWon();
+            }
+            else
+            {
+                resultScreen.SetLost();
+            }
         }
 
 

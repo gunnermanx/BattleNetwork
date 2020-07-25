@@ -46,7 +46,8 @@ namespace BattleNetwork.Characters
         public bool TryBasicAttack(int currentTick)
         {
             // TODO configurable tick attack delay
-            if (currentTick >= lastBasicAttackTick + 3) {
+            // means every Nth tick we can attack
+            if (currentTick >= lastBasicAttackTick + 6) {
                 lastBasicAttackTick = currentTick;
                 return true;
             }

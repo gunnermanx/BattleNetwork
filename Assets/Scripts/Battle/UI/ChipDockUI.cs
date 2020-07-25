@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using BattleNetwork.Data;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -161,11 +162,14 @@ namespace BattleNetwork.Battle.UI
 
         public void AddChip(int index, short chipId)
         {
+            // Probably want to clean this up..
+            Chip c = GameDB.Instance.ChipsDB.GetChip(chipId);
+
             GameObject chip = GameObject.Instantiate(chipUIPrefab.gameObject);
             chip.transform.SetParent(anchors[index], false);
             ChipUI chipUI = chip.GetComponent<ChipUI>();
             chipUI.Index = index;
-            chipUI.Initialize(chipId, chipVisualsDatabase.GetCachedData()[chipId]);
+            chipUI.Initialize(chipId, chipVisualsDatabase.GetCachedData()[chipId], c.cost);
             dockedChips[index] = chipUI;
         }
 
