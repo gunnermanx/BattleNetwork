@@ -26,7 +26,7 @@ namespace BattleNetwork.Battle.ServerCommandHandlers
             {
                 Debug.LogFormat("change in energy, previous {0}, after: {1}", this.bm.Energy, this.bm.Energy + deltaEnergy);
                 this.bm.Energy = this.bm.Energy + deltaEnergy;
-                energyChangedEvent.Raise(this.bm.Energy, BattleManager.TICKS_PER_ENERGY * BattleManager.TICK_TIME);
+                energyChangedEvent.Raise(this.bm.Energy, BattleManager.TICKS_PER_ENERGY * BattleManager.INTERVAL_S);
             }
         }
     }

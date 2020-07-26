@@ -23,8 +23,27 @@ namespace BattleNetwork.Battle
         private static readonly int P1_PLAYER_UNIT_ID = 1;
         private static readonly int P2_PLAYER_UNIT_ID = 2;
 
-        public static readonly int TICKS_PER_ENERGY = 40;
-        public static readonly float TICK_TIME = 0.05f;
+        // Values ripped from server code essentially.
+        // 50ms tick time => 20hz game ticker
+        public static readonly int TICKS_PER_SECOND = 20;
+        public static readonly int INTERVAL_MS = 1000 / TICKS_PER_SECOND;
+        public static readonly float INTERVAL_S = INTERVAL_MS / 1000;
+        // Energy is gained at a rate of 1 second
+        private static readonly int MILLISECONDS_PER_ENERGY = 2000;
+        // ticks per energy is naturally = MILLISECONDS_PER_ENERGY / INTERVAL_MS
+        public static readonly int TICKS_PER_ENERGY = MILLISECONDS_PER_ENERGY / INTERVAL_MS;
+        // Max energy
+        private static readonly int MAX_ENERGY = 6;
+
+        // Milliseconds before the game starts after the tick starts
+        private static readonly int STARTING_TIME_MILLISECONDS = 5000;
+        private static readonly int ROUND_DURATION_MILLISECONDS = 60000;
+        public static readonly int ROUND_DURATION_SECONDS = ROUND_DURATION_MILLISECONDS / 1000;
+
+        public static readonly int ROUND_START_TICK = STARTING_TIME_MILLISECONDS / INTERVAL_MS;
+        public static readonly int ROUND_END_TICK = ROUND_START_TICK + ROUND_DURATION_MILLISECONDS / INTERVAL_MS;
+
+
 
         // temporary, we want to load it dynamically later
         [SerializeField] private GameObject arenaPrefab;
@@ -61,19 +80,28 @@ namespace BattleNetwork.Battle
 
         private Dictionary<byte, BaseCommandHandler> serverHandlerCommands;
 
+
+
         private void Update()
         {
             if (currentTick + 1 <= serverTick)
             {
-                currentTick++;
+                currentTick++;              
                 battleTickEvent.Raise(currentTick);
-
-                // figure out better way later to init energy bar value + movement
-                if (currentTick == 1)
+                
+                battleUI.HandleTick(currentTick);
+                
+                // TODO:
+                if (!gameStarted && currentTick >= ROUND_START_TICK)
                 {
                     gameStarted = true;
-                    energyChangedEvent.Raise(Energy, TICKS_PER_ENERGY * TICK_TIME);
+                    energyChangedEvent.Raise(Energy, TICKS_PER_ENERGY * INTERVAL_S);
                     readyInfoOverlay.SetActive(false);
+                }
+
+                if (gameStarted && currentTick >= ROUND_END_TICK)
+                {
+                    gameStarted = false;
                 }
             }
         }
