@@ -37,7 +37,7 @@ namespace BattleNetwork.Battle
 
         // Milliseconds before the game starts after the tick starts
         private static readonly int STARTING_TIME_MILLISECONDS = 5000;
-        private static readonly int ROUND_DURATION_MILLISECONDS = 60000;
+        private static readonly int ROUND_DURATION_MILLISECONDS = 99000;
         public static readonly int ROUND_DURATION_SECONDS = ROUND_DURATION_MILLISECONDS / 1000;
 
         public static readonly int ROUND_START_TICK = STARTING_TIME_MILLISECONDS / INTERVAL_MS;
