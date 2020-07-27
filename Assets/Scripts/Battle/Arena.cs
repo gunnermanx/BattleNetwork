@@ -12,6 +12,9 @@ namespace BattleNetwork.Battle
     {
         // Arena needs to know what is on a tile, because it needs to evaluate if something can mvoe onto it
 
+        private static readonly int ARENA_LENGTH = 6;
+        private static readonly int ARENA_WIDTH = 3;
+
         [SerializeField]
         private ArenaData arenaData;
 
@@ -19,7 +22,7 @@ namespace BattleNetwork.Battle
         private Transform arenaAnchorsParent;
 
         private Dictionary<string, GameObject> anchors;
-        private Dictionary<string, Tile> tiles;
+        private Tile[,] tiles;
 
         private Dictionary<int, BaseUnit> units;
 
@@ -43,9 +46,12 @@ namespace BattleNetwork.Battle
         {
             Debug.LogFormat("placing a player unit for player {0}", owner);
 
-
             string startingTileName = (owner == Constants.Owner.Player1) ? arenaData.player1StartingTileName : arenaData.player2StartingTileName;
-            unit.currentTile = startingTileName;
+            string[] startingTileNameArr = startingTileName.Split('_');
+            int x = Int32.Parse(startingTileNameArr[0]);
+            int z = Int32.Parse(startingTileNameArr[1]);
+
+            unit.tilePos = new Vector2(x, z);
             GameObject anchor = GetAnchorForTileName(startingTileName);
             if (anchor != null)
             {
@@ -78,7 +84,7 @@ namespace BattleNetwork.Battle
 
         // statically determine which path to go instead of recalculating
 
-        public void ServerMoveUnit(int unitId, int x, int y)
+        public void ServerMoveUnit(int unitId, int x, int z)
         {
             SmartFox sfs = SFSConnector.Instance.Connection;
 
@@ -91,14 +97,11 @@ namespace BattleNetwork.Battle
                 (unit as PlayerUnit).TriggerMoveAnimation();
             }
 
-            string newTileName = x + "_" + y;
-
-            Tile newTile;
-            if (tiles.TryGetValue(newTileName, out newTile))
-            {
-                unit.currentTile = newTileName;
-                unit.transform.position = newTile.transform.position + new Vector3(0f, 0.5f, 0f);                
-            }
+            Tile targetTile = tiles[x, z];            
+            unit.tilePos = new Vector2(x, z);
+            unit.transform.position = targetTile.transform.position + new Vector3(0f, 0.5f, 0f);                
+            
+            
         }
 
         public void ServerDamageUnit(int unitId, int damage)
@@ -137,13 +140,13 @@ namespace BattleNetwork.Battle
             if (playerId == 1)
             {
                 target = p1PlayerUnit;
-                p1ActiveChip = ChipFactory.GetChip(target, playerId, chipId);
+                p1ActiveChip = ChipFactory.GetChip(target, playerId, chipId, this);
                 p1ActiveChip.Init();
             }
             else if (playerId == 2)
             {
                 target = p2PlayerUnit;
-                p2ActiveChip = ChipFactory.GetChip(target, playerId, chipId);
+                p2ActiveChip = ChipFactory.GetChip(target, playerId, chipId, this);
                 p2ActiveChip.Init();
             }
         }
@@ -151,46 +154,67 @@ namespace BattleNetwork.Battle
 
         public bool TryMove(PlayerUnit unit, byte dir)
         {
-            string currentTileName = unit.currentTile;
-            string[] currentTileNameArr = currentTileName.Split('_');
-
-            int x = Int32.Parse(currentTileNameArr[0]);
-            int z = Int32.Parse(currentTileNameArr[1]);
-
-            string newTileName = "";
-
+            Vector2 target = Vector3.zero;
             switch (dir)
             {
                 case (byte) 'u':
-                    newTileName = x + "_" + (z + 1);
+                    target = new Vector2(unit.tilePos.x, unit.tilePos.y + 1);
                     break;
                 case (byte) 'd':
-                    newTileName = x + "_" + (z - 1);
+                    target = new Vector2(unit.tilePos.x, unit.tilePos.y - 1);
                     break;
                 case (byte) 'l':
-                    newTileName = (x - 1) + "_" + z;
+                    target = new Vector2(unit.tilePos.x - 1, unit.tilePos.y);
                     break;
                 case (byte) 'r':
-                    newTileName = (x + 1) + "_" + z;
-                    break;                
+                    target = new Vector2(unit.tilePos.x + 1, unit.tilePos.y);
+                    break;
+                default:
+                    return false;
             }
 
-            Tile newTile;
-            if (tiles.TryGetValue(newTileName, out newTile))
+            if (IsTileCoordsValid((int)target.x, (int)target.y))
             {
-                if (unit.owner != newTile.owner)
+                Tile targetTile = tiles[(int)target.x, (int)target.y];                
+                if (unit.owner != targetTile.owner)
                 {
                     return false;
                 }
-                unit.currentTile = newTileName;
-                unit.transform.position = newTile.transform.position + new Vector3(0f, 0.5f, 0f);
+                unit.tilePos = target;
+                unit.transform.position = targetTile.transform.position + new Vector3(0f, 0.5f, 0f);
                 unit.TriggerMoveAnimation();
                 return true;
+               
             }
 
             return false;
         }
 
+        
+        public void TargetRow(int startingX, int z, byte dir)
+        {
+        }
+
+        public void TargetColumn(int x)
+        {
+
+        }
+
+        public void TargetTile(int x, int z, bool add)
+        {
+            if ( IsTileCoordsValid(x,z) )
+            {
+                Debug.LogFormat("TargetTile [{0},{1}] : {2}", x, z, add);
+                if (add)
+                {
+                    tiles[x, z].Target();
+                } else
+                {
+                    tiles[x, z].Untarget();
+                }
+                
+            }            
+        }
 
 
         private void LoadArenaData()
@@ -203,11 +227,16 @@ namespace BattleNetwork.Battle
             }
 
             anchors = new Dictionary<string, GameObject>();
-            tiles = new Dictionary<string, Tile>();
-           
+            tiles = new Tile[6, 3];
+
             for (int i = 0; i < arenaData.tiles.Count; i++)
             {
                 TileData tileData = arenaData.tiles[i];
+
+                String[] coordStrings = tileData.name.Split('_');
+                int x = Int32.Parse(coordStrings[0]);
+                int z = Int32.Parse(coordStrings[1]);
+
                 // Create anchor
                 GameObject anchor = new GameObject(tileData.name);
                 Transform anchorTransform = anchor.transform;
@@ -218,7 +247,8 @@ namespace BattleNetwork.Battle
                 GameObject tileGO = GameObject.Instantiate(tileData.tilePrefab, anchorTransform);
                 Tile tile = tileGO.GetComponent<Tile>();
                 tile.owner = tileData.owner;
-                tiles.Add(tileData.name, tile);
+                tiles[x, z] = tile;
+                
             }
 
             Debug.LogFormat("Loaded Arena data: {0}", arenaData.name);
@@ -232,7 +262,7 @@ namespace BattleNetwork.Battle
             }
 
             anchors.Clear();
-            tiles.Clear();
+            tiles = null;
         }
 
         private void OnDrawGizmos()
@@ -246,6 +276,15 @@ namespace BattleNetwork.Battle
                     Gizmos.DrawWireCube(anchor.position, new Vector3(2.0f, 0.5f, 2.0f));
                 }
             }            
+        }
+
+        public bool IsTileCoordsValid(int x, int z)
+        {
+            if (x >= 0 && x < ARENA_LENGTH && z >= 0 && z < ARENA_WIDTH)
+            {
+                return true;
+            }
+            return false;
         }
     }
 

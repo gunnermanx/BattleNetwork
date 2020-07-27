@@ -17,10 +17,13 @@ namespace BattleNetwork.Battle.Chips
         public int playerId;
         public short chipId;
 
-        public BaseChip(PlayerUnit unit, int playerId, short chipId) {
+        protected Arena arenaRef;
+
+        public BaseChip(PlayerUnit unit, int playerId, short chipId, Arena arena) {
             this.unit = unit;
             this.playerId = playerId;
             this.chipId = chipId;
+            this.arenaRef = arena;
         }
 
         public abstract void Init();

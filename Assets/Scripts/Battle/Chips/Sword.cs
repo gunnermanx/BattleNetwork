@@ -9,7 +9,7 @@ namespace BattleNetwork.Battle.Chips
 { 
     public class Sword : BaseChip
     {
-        public Sword(PlayerUnit unit, int playerId, short chipId) : base(unit, playerId, chipId)
+        public Sword(PlayerUnit unit, int playerId, short chipId, Arena arena) : base(unit, playerId, chipId, arena)
         {
 
         }

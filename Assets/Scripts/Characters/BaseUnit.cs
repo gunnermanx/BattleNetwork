@@ -8,7 +8,8 @@ namespace BattleNetwork.Characters
     {
         public int id;
 
-        public string currentTile;
+        public Vector2 tilePos;
+
         public Constants.Owner owner;
     }
 }
