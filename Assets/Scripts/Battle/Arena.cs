@@ -195,9 +195,12 @@ namespace BattleNetwork.Battle
         {
         }
 
-        public void TargetColumn(int x)
+        public void TargetColumn(int x, bool add)
         {
-
+            for (int z = 0; z < ARENA_WIDTH; z++)
+            {
+                TargetTile(x, z, add);
+            }
         }
 
         public void TargetTile(int x, int z, bool add)

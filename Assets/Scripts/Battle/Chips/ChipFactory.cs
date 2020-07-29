@@ -1,6 +1,4 @@
-﻿
-
-using BattleNetwork.Characters;
+﻿using BattleNetwork.Characters;
 
 namespace BattleNetwork.Battle.Chips
 {
@@ -11,12 +9,14 @@ namespace BattleNetwork.Battle.Chips
 
 			switch (cid)
 			{
-				case (short)0:
+				case (short)10:
+					return new Cannon(unit, playerId, cid, arena);					
+				case (short)20:
 					return new Missile(unit, playerId, cid, arena);
-				case (short)1:
-					return new Cannon(unit, playerId, cid, arena);
-				case (short)2:
+				case (short)50:
 					return new Sword(unit, playerId, cid, arena);
+				case (short)80:
+					return new Poison(unit, playerId, cid, arena);
 			}
 
 

@@ -60,5 +60,6 @@ namespace BattleNetwork.Data
         public int projectileSpeed;
         public int width;
         public int depth;
+        public int duration;
     }
 }
