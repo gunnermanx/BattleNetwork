@@ -195,28 +195,30 @@ namespace BattleNetwork.Battle
         {
         }
 
-        public void TargetColumn(int x, bool add)
+        public void TargetColumn(int x, int sourceId, int duration)
         {
             for (int z = 0; z < ARENA_WIDTH; z++)
             {
-                TargetTile(x, z, add);
+                TargetTile(x, z, sourceId, duration);
             }
         }
 
-        public void TargetTile(int x, int z, bool add)
+        public void TargetTile(int x, int z, int sourceId, int duration)
         {
             if ( IsTileCoordsValid(x,z) )
             {
-                Debug.LogFormat("TargetTile [{0},{1}] : {2}", x, z, add);
-                if (add)
-                {
-                    tiles[x, z].Target();
-                } else
-                {
-                    tiles[x, z].Untarget();
-                }
-                
+                Debug.LogFormat("TargetTile [{0},{1}] : {2}", x, z, duration);
+                tiles[x, z].Target(sourceId, duration);                
             }            
+        }
+
+        public void UntargetTile(int x, int z, int sourceId)
+        {
+            if (IsTileCoordsValid(x, z))
+            {
+                Debug.LogFormat("UntargetTile [{0},{1}]", x, z);
+                tiles[x, z].Untarget(sourceId);
+            }
         }
 
 

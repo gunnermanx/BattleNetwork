@@ -33,15 +33,15 @@ namespace BattleNetwork.Battle.Chips
 
             Chip c = GameDB.Instance.ChipsDB.GetChip(chipId);
             ChipData cd = c.data[level];
-
+            
             if (playerId == 1)
             {
-                this.arenaRef.TargetColumn(4, true);
-                this.arenaRef.TargetColumn(5, true);
+                this.arenaRef.TargetColumn(4, chipId, cd.duration * BattleManager.TICKS_PER_SECOND);
+                this.arenaRef.TargetColumn(5, chipId, cd.duration * BattleManager.TICKS_PER_SECOND);
             } else
             {
-                this.arenaRef.TargetColumn(0, true);
-                this.arenaRef.TargetColumn(1, true);
+                this.arenaRef.TargetColumn(0, chipId, cd.duration * BattleManager.TICKS_PER_SECOND);
+                this.arenaRef.TargetColumn(1, chipId, cd.duration * BattleManager.TICKS_PER_SECOND);
             }
             
         }

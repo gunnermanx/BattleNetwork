@@ -32,6 +32,7 @@ namespace BattleNetwork.Characters
 
             transform.position = new Vector3(startPos.x, 1.55f, startPos.z);
 
+            arena.TargetTile((int)tilePos.x, (int)tilePos.y, gameObject.GetInstanceID(), speed);
 
             battleTickEventListener = gameObject.GetComponent<BattleTickEventListener>();
             battleTickEventListener.tickCallback += HandleBattleTick;
@@ -54,9 +55,8 @@ namespace BattleNetwork.Characters
                 
                 if (progress % speed == 0)
                 {
-                    arena.TargetTile((int)tilePos.x, (int)tilePos.y, false);
                     tilePos = new Vector2(tilePos.x + 1, tilePos.y);
-                    arena.TargetTile((int)tilePos.x, (int)tilePos.y, true);
+                    arena.TargetTile((int)tilePos.x, (int)tilePos.y, gameObject.GetInstanceID(), speed);
                 }
             } else
             {
@@ -69,9 +69,8 @@ namespace BattleNetwork.Characters
 
                 if (progress % speed == 0)
                 {
-                    arena.TargetTile((int)tilePos.x, (int)tilePos.y, false);
                     tilePos = new Vector2(tilePos.x -1, tilePos.y);
-                    arena.TargetTile((int)tilePos.x, (int)tilePos.y, true);
+                    arena.TargetTile((int)tilePos.x, (int)tilePos.y, gameObject.GetInstanceID(), speed);
                 }
             }
             
@@ -86,11 +85,10 @@ namespace BattleNetwork.Characters
             
             Damageable d = other.GetComponent<Damageable>();
 
-
             //Debug.LogFormat("TRIGGER hitting damageable : otherOwner{0}   bulletOwner {1}", d.owner, owner);
             if (d != null && d.owner != owner)
             {
-                arena.TargetTile((int)tilePos.x, (int)tilePos.y, false);
+                arena.UntargetTile((int)tilePos.x, (int)tilePos.y, gameObject.GetInstanceID());
                 GameObject.Destroy(gameObject);
             }
         }
