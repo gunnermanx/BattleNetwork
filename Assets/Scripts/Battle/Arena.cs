@@ -132,6 +132,12 @@ namespace BattleNetwork.Battle
             }
         }
 
+        public void ServerTileOwnershipChange(int playerId, int x, int y)
+        {
+            Constants.Owner owner = (playerId == 1) ? Constants.Owner.Player1 : Constants.Owner.Player2;
+            tiles[x, y].SetOwner(owner);
+        }
+
         public void ServerPlayedChip(int playerId, short chipId)
         {
             // Some kind of chip system here, similar to server that will tick chips 
@@ -176,7 +182,7 @@ namespace BattleNetwork.Battle
             if (IsTileCoordsValid((int)target.x, (int)target.y))
             {
                 Tile targetTile = tiles[(int)target.x, (int)target.y];                
-                if (unit.owner != targetTile.owner)
+                if (unit.owner != targetTile.Owner())
                 {
                     return false;
                 }
@@ -251,7 +257,7 @@ namespace BattleNetwork.Battle
                 // Create tile
                 GameObject tileGO = GameObject.Instantiate(tileData.tilePrefab, anchorTransform);
                 Tile tile = tileGO.GetComponent<Tile>();
-                tile.owner = tileData.owner;
+                tile.SetOwner(tileData.owner);
                 tiles[x, z] = tile;
                 
             }

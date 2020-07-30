@@ -12,7 +12,10 @@ namespace BattleNetwork.Battle
     {
         [SerializeField] private GameObject attackIndicator;
 
-        public Constants.Owner owner;
+        [SerializeField] private GameObject p1Tile;
+        [SerializeField] private GameObject p2Tile;
+
+        private Constants.Owner owner;
 
         public int attacksTargetting = 0;
 
@@ -31,6 +34,25 @@ namespace BattleNetwork.Battle
 
             battleTickEventListener = gameObject.GetComponent<BattleTickEventListener>();
             battleTickEventListener.tickCallback += HandleTick;
+        }
+
+        public void SetOwner(Constants.Owner owner)
+        {
+            this.owner = owner;
+            if (this.owner == Constants.Owner.Player1)
+            {
+                p1Tile.SetActive(true);
+                p2Tile.SetActive(false);
+            } else
+            {
+                p1Tile.SetActive(false);
+                p2Tile.SetActive(true);
+            }
+        }
+
+        public Constants.Owner Owner()
+        {
+            return this.owner;
         }
 
         private void HandleTick(int currentTick)

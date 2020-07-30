@@ -17,6 +17,8 @@ namespace BattleNetwork.Battle.Chips
 					return new Sword(unit, playerId, cid, arena);
 				case (short)80:
 					return new Poison(unit, playerId, cid, arena);
+				case (short)100:
+					return new AreaGrab(unit, playerId, cid, arena);
 			}
 
 

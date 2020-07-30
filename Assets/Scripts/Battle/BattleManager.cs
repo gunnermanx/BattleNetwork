@@ -26,6 +26,7 @@ namespace BattleNetwork.Battle
         // Values ripped from server code essentially.
         // 50ms tick time => 20hz game ticker
         public static readonly int TICKS_PER_SECOND = 20;
+
         public static readonly int INTERVAL_MS = 1000 / TICKS_PER_SECOND;
         public static readonly float INTERVAL_S = INTERVAL_MS / 1000;
         // Energy is gained at a rate of 1 second
@@ -127,6 +128,7 @@ namespace BattleNetwork.Battle
             serverHandlerCommands.Add(BaseCommandHandler.CHIP_DRAWN_CMD_ID,         new ChipDrawnCommandHandler(this));
             serverHandlerCommands.Add(BaseCommandHandler.CHIP_PLAYED_CMD_ID,        new ChipPlayedCommandHandler(this));
             serverHandlerCommands.Add(BaseCommandHandler.BASIC_ATTACK_CMD_ID,       new BasicAttackCommandHandler(this));
+            serverHandlerCommands.Add(BaseCommandHandler.TILE_OWNERSHIP_CHANGE_ID,  new TileOwnershipChangeCommandHandler(this));
 
 
             // Gesture event handlers

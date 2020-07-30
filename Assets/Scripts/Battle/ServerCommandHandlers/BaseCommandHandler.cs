@@ -11,6 +11,7 @@ namespace BattleNetwork.Battle.ServerCommandHandlers
         public static readonly byte CHIP_DRAWN_CMD_ID       = (byte)4;
         public static readonly byte CHIP_PLAYED_CMD_ID      = (byte)5;
         public static readonly byte BASIC_ATTACK_CMD_ID     = (byte)6;
+        public static readonly byte TILE_OWNERSHIP_CHANGE_ID = (byte)7;
 
         protected BattleManager bm;
 
