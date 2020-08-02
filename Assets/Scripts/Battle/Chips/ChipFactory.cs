@@ -10,7 +10,9 @@ namespace BattleNetwork.Battle.Chips
 			switch (cid)
 			{
 				case (short)10:
-					return new Cannon(unit, playerId, cid, arena);					
+					return new Cannon(unit, playerId, cid, arena);
+				case (short)11:
+					return new Vulcan(unit, playerId, cid, arena);
 				case (short)20:
 					return new Missile(unit, playerId, cid, arena);
 				case (short)50:
